@@ -19,7 +19,7 @@ library(learnr)
 
 The scheme below describes bacterial kinetics in a well-stirred closed system, and describes bacterial biomass (B) and dissolved organic carbon (DOC), in units of mol C $m^{-3}$. 
 
-![Bacterial-DOC dynamics](Bact_DOC.png)
+![Bacterial-DOC dynamics](images/BactDOC.png)
 
 Here the Bacteria and DOC are state variables whose dynamics we want to describe.
 
