@@ -1,0 +1,13 @@
+Package: aubergine
+Type: Package
+Title: tutorials and exercises for a 1-Day workshop
+Version: 0.1.0
+Author: Karline Soetaert and Thomas Petzoldt
+Maintainer: Karline Soetaert <Karline.Soetaert@nioz.nl>
+Depends: R (>= 3.0), learnr, ReacTran, deSolve, rootSolve
+Suggests: knitr, rmarkdown, FME
+Description: Tutorials for use in a 1-D modelling workshop organized by AEMON-J. Tutors are Thomas Petzoldt and Karline Soetaert.
+License: GPL (>=3.0)
+VignetteBuilder: knitr
+Encoding: UTF-8
+LazyData: true

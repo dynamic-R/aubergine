@@ -1,0 +1,119 @@
+---
+title: "Modelling workshop"
+author: "Karline Soetaert and Thomas Petzoldt"
+date: "July-2021"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(learnr)
+```
+
+## Tutorial
+
+You are advised to watch the following video first 
+
+![](https://www.youtube.com/watch?v=CUckCAwNj1s&list=PLx8PHcDdmF-uD1Pr07TU9SzlhlGpfrxqn&index=9)
+
+SHOULD OPEN YOUR VIDEO
+
+## About the authors (Thomas and Karline)
+
+```{r background, echo=FALSE}
+question("What is our scientific background?", type = "learnr_checkbox",
+ answer("Mathematics"),
+ answer("Statistics"),
+ answer("Biology", correct=TRUE),
+ answer("Biogeochemistry"),
+ answer("Computer science", correct=TRUE),
+ correct = "We are both biologists with a passion for mathematics; Thomas is a limnologist, Karline is a marine biologist. After her master in biology, Karline also studied computer sciences.",
+ incorrect = "We are both biologists with a passion for mathematics; Thomas is a limnologist, Karline is a marine biologist. After her master in biology, Karline also studied computer sciences.")
+```
+
+```{r Model_types, echo=FALSE}
+question("Which type of models do we typically use?", type = "learnr_checkbox",
+ answer("Mechanistic models", correct=TRUE),
+ answer("Statistical models"),
+ answer("Black-box models"),
+ answer("Qualitative models"),
+ correct = "We develop mechanistic models that start from principles of physics, chemistry,
+biology, ecology, and that are mathematically composed of differential equations. They are so-called
+“engineering type of models”, aiming to advance our understanding of natural systems and that allow
+prediction of these systems under various scenarios.",
+ incorrect = "We develop mechanistic models that start from principles of physics, chemistry,
+biology, ecology, and that are mathematically composed of differential equations. They are so-called
+“engineering type of models”, aiming to advance our understanding of natural systems and that allow
+prediction of these systems under various scenarios."  
+)
+```
+
+```{r why_modelling, echo=FALSE}
+question("Why do we develop mechanistic models?", type = "learnr_checkbox",
+answer("they allow us to test our understanding of real systems", correct=TRUE),
+answer("they allow us to extrapolate to larger spatial and temporal scales", correct=TRUE),
+answer("they can guide empirical research", correct=TRUE),
+answer("they allow us to invalidate empirical research", correct=FALSE),
+answer("they allow us to test hypotheses", correct=FALSE),
+answer("they allow us to generate hypotheses", correct=TRUE),
+answer("because it is a lot of fun", correct=FALSE),
+
+incorrect = "Modelling IS a lot of fun, but this is not our primary goal - we use models in addition to data gathering because it gives a different perspective of reality, it increases our understanding, allows to extrapolate, it may guide our research and may be used to generate hypotheses",
+correct = "Modelling IS a lot of fun, but this is not our primary goal - we use models in addition to data gathering because it gives a different perspective of reality, it increases our understanding, allows to extrapolate, it may guide our research and may be used to generate hypotheses" 
+  )
+```
+
+```{r programming_platform, echo=FALSE}
+question("Which programming language do we use to solve our models?", type = "learnr_checkbox",
+answer("Rstudio"),
+answer("Rmarkdown"),
+answer("R", correct=TRUE),
+answer("Matlab"),
+answer("Python"),
+answer("deSolve"),
+incorrect = "In this list, only R, matlab and python are programming languages, and R is the one that we use. Rmarkdown is a platform to merge R-code with text;  Rstudio provides an interface that facilitates using R; deSolve is one of the many R-packages that we use",
+correct = "In this list, only R, matlab and python are programming languages, and R is the one that we  use. Rmarkdown is a platform to merge R-code with text;  Rstudio provides an interface that facilitates using R; deSolve is one of the many R-packages that we use" 
+  )
+```
+
+```{r why_R, echo=FALSE}
+question("Why do we use R?", type = "learnr_checkbox",
+answer("it is faster than matlab or python"),
+answer("it is as good as matlab or python", correct= TRUE),
+answer("it is very well suited for post-processing", correct=TRUE),
+answer("it is an open-source community project", correct=TRUE),
+answer("the solvers have been optimised for mechanistic modeling", correct=TRUE),
+answer("it is easy to share models made in R", correct=TRUE),
+answer("we can run complex 3-D applications in R", correct=FALSE),
+
+incorrect = "We started using R around 2005-2010 because we thought it had potential, it was open-source, and supported by a growing community of R enthousiasts. Since then we created tools in R to make it suitable for our type of work. Even after all this time, R is still the best language to apply our type of models - it is ideal for teaching environmental modeling, as well as for more 'serious' scientific work. For the really complex models however, we resort to dedicated software, written in compiled code",
+  correct = "We started using R around 2005-2010 because we thought it had potential, it was open-source, and supported by a growing community of R enthousiasts. Since then we created tools in R to make it suitable for our type of work. Even after all this time, R is still the best language to apply our type of models - it is ideal for teaching environmental modeling, as well as for more 'serious' scientific work. For the really complex models however, we resort to dedicated software, written in compiled code"
+  )
+```
+
+## Model focus
+
+```{r Model_focus, echo=FALSE}
+question("What is the focus of environmental mechanistic models ?", type = "learnr_checkbox",
+ answer("Exchange of mass", correct=TRUE),
+ answer("Exchange of energy", correct=TRUE),
+ answer("Biogeochemical processes in cells", correct=FALSE),
+ answer("Impact of biogeochemical processes on the environment", correct=TRUE),
+ answer("Predicting of human impacts on the environment", correct=TRUE),
+ answer("Predicting the weather", correct=FALSE),
+ answer("Predicting stock markets", correct=FALSE),
+
+  incorrect = "Although we can do all the things listed above with mechanistic models, in environmental sciences, we restrict ourselves to exchanges of mass and energy and biogeochemistry/ecology relating to the environment",
+  correct = "Although we can do all the things listed above with mechanistic models, in environmental sciences, we restrict ourselves to exchanges of mass and energy and biogeochemistry/ecology relating to the environment")
+```
+
+## Finally
+
+```{r feedback, echo = FALSE}
+question("give your feedback ", type = "learnr_text", answer(" ", correct=TRUE), correct="thank you", incorrect = "thank you")
+```
+
