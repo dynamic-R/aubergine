@@ -1,5 +1,5 @@
 ---
-title: "Modelling workshop"
+title: "Modelling in R: Introduction"
 author: "Karline Soetaert and Thomas Petzoldt"
 description: "This tutorial gives a brief introduction to the workshop. Watch the introductory video and try to answer a few questions."
 date: "July-2021"

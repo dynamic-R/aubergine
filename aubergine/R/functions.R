@@ -1,6 +1,6 @@
 
 
-AUBtutorial <- function(x = c("aubergine", "courgette")) {
+AUBtutorial <- function(x = c("01-introduction", "bacterial-kinetics")) {
 
   LL <- as.character(formals(AUBtutorial)$x[-1])
 

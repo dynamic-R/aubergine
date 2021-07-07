@@ -3,7 +3,7 @@
 \alias{AUBexercise}
 \title{Aquatic Modelling Workshop: tutorials and exercises}
 \usage{
-AUBtutorial (x = c("aubergine", "courgette"))
+AUBtutorial (x = c("01-introduction", "bacterial-kinetics"))
     
 AUBexercise(x = c("npzd", "riverAnoxia"), type = c("HTML", "PDF", "RMD", "WORD"))  
 }
