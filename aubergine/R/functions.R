@@ -1,6 +1,6 @@
 
 
-AUBtutorial <- function(x = c("01-introduction", "bacterial-kinetics")) {
+AUBtutorial <- function(x = c("01-introduction", "02-chemostat", "bacterial-kinetics")) {
 
   LL <- as.character(formals(AUBtutorial)$x[-1])
 

@@ -3,9 +3,9 @@
 \alias{AUBexercise}
 \title{Aquatic Modelling Workshop: tutorials and exercises}
 \usage{
-AUBtutorial (x = c("01-introduction", "bacterial-kinetics"))
-    
-AUBexercise(x = c("npzd", "riverAnoxia"), type = c("HTML", "PDF", "RMD", "WORD"))  
+AUBtutorial (x = c("01-introduction", "02-chemostat", "bacterial-kinetics"))
+
+AUBexercise(x = c("npzd", "riverAnoxia"), type = c("HTML", "PDF", "RMD", "WORD"))
 }
 \arguments{
   \item{x }{the name or the number of the tutorial, exercise or reader. When x = "?", a list of tutorials, exercises or readers will be displayed, including a short description.
@@ -15,9 +15,9 @@ AUBexercise(x = c("npzd", "riverAnoxia"), type = c("HTML", "PDF", "RMD", "WORD")
 }
 
 \description{
-The tutorials contain a link to the video(s) that introduce the workshop, followed by questions/quizzes (multiple choice) and small exercises to be written in R. 
+The tutorials contain a link to the video(s) that introduce the workshop, followed by questions/quizzes (multiple choice) and small exercises to be written in R.
 
-The exercises are short tasks to be completed in 2 to 4 hours. 
+The exercises are short tasks to be completed in 2 to 4 hours.
 }
 
 \note{
