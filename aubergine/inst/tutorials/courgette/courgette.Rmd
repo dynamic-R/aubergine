@@ -1,6 +1,7 @@
 ---
 title: "Modelling in R"
 author: "Karline Soetaert and Thomas Petzoldt"
+description: "This tutorial describes bacterian kinetics in a well-stirred closed system."
 date: "July-2021"
 output: 
   learnr::tutorial:

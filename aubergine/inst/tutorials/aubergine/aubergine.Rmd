@@ -1,6 +1,7 @@
 ---
 title: "Modelling workshop"
 author: "Karline Soetaert and Thomas Petzoldt"
+description: "This tutorial gives a brief introduction to the workshop. Watch the introductory video and try to answer a few questions."
 date: "July-2021"
 output: 
   learnr::tutorial:
@@ -18,7 +19,7 @@ library(learnr)
 
 You are advised to watch the following video first 
 
-![](https://www.youtube.com/watch?v=CUckCAwNj1s&list=PLx8PHcDdmF-uD1Pr07TU9SzlhlGpfrxqn&index=9)
+![](https://youtu.be/L_zL_D1Qmjc)
 
 SHOULD OPEN YOUR VIDEO
 
