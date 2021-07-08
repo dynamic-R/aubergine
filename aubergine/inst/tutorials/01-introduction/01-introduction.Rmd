@@ -84,18 +84,19 @@ correct = "In this list, only R, matlab and python are programming languages, an
 ```
 
 ```{r why_R, echo=FALSE}
-question("Why do we use R?", type = "learnr_checkbox",
-answer("it is faster than matlab or python"),
-answer("it is as good as matlab or python", correct= TRUE),
-answer("it is very well suited for post-processing", correct=TRUE),
-answer("it is an open-source community project", correct=TRUE),
-answer("the solvers have been optimised for mechanistic modeling", correct=TRUE),
-answer("it is easy to share models made in R", correct=TRUE),
-answer("we can run complex 3-D applications in R", correct=FALSE),
+answertext <- "We started using R around 2005-2010 because we thought it had potential, it was open-source, and supported by a growing community of R enthousiasts. Since then we created tools in R to make it suitable for our type of work. Even after all this time, R is still the best language to apply our type of models - it is ideal for teaching environmental modeling, as well as for more 'serious' scientific work. For the really complex models however, we resort to dedicated software, written in compiled code"
 
-incorrect = "We started using R around 2005-2010 because we thought it had potential, it was open-source, and supported by a growing community of R enthousiasts. Since then we created tools in R to make it suitable for our type of work. Even after all this time, R is still the best language to apply our type of models - it is ideal for teaching environmental modeling, as well as for more 'serious' scientific work. For the really complex models however, we resort to dedicated software, written in compiled code",
-  correct = "We started using R around 2005-2010 because we thought it had potential, it was open-source, and supported by a growing community of R enthousiasts. Since then we created tools in R to make it suitable for our type of work. Even after all this time, R is still the best language to apply our type of models - it is ideal for teaching environmental modeling, as well as for more 'serious' scientific work. For the really complex models however, we resort to dedicated software, written in compiled code"
-  )
+question("Why do we use R?", type = "learnr_checkbox",
+  answer("it is faster than matlab or python"),
+  answer("it is as good as matlab or python", correct= TRUE),
+  answer("it is very well suited for post-processing", correct=TRUE),
+  answer("it is an open-source community project", correct=TRUE),
+  answer("the solvers have been optimised for mechanistic modeling", correct=TRUE),
+  answer("it is easy to share models made in R", correct=TRUE),
+  answer("we can run complex 3-D applications in R", correct=FALSE),
+  incorrect = answertext,
+  correct = answertext
+)
 ```
 
 ## Model focus
