@@ -17,11 +17,13 @@ library(learnr)
 
 ## Tutorial
 
-You are advised to watch the following video first 
+We recommend to watch the introductory video first:
 
 ![](https://youtu.be/L_zL_D1Qmjc)
 
-SHOULD OPEN YOUR VIDEO
+If you prefer reading, you can find the slides under [this link](https://dynamic-r.github.io/hacking-limnology/).
+
+
 
 ## About the authors (Thomas and Karline)
 
