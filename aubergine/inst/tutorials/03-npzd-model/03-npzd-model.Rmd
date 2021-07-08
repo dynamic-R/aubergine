@@ -1,0 +1,20 @@
+---
+title: "Modelling in R: An NPZD Model"
+author: "Karline Soetaert and Thomas Petzoldt"
+description: "This tutorial explains elements of an NPZD model."
+date: "July-2021"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(learnr)
+```
+
+## Tutorial
+
+... put text and code here

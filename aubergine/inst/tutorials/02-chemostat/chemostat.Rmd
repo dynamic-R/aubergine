@@ -1,14 +1,19 @@
 ---
-title: "Differential Equation Model of a Chemostat"
+title: "Modelling in R: A Chemostat"
 author: "Thomas Petzoldt"
 description: "The example shows a chemostat model by example of an autotrophic organisms, where growth is limited by a single nutrient (e.g. phosphorus) via a Monod equation."
-date: "`r Sys.Date()`"
+date: "July-2021"
 bibliography: chemostat.bib
-output: html_document
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(learnr)
 ```
 
 ## Introduction
