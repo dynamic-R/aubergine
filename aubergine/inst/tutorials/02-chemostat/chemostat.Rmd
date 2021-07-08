@@ -1,0 +1,126 @@
+---
+title: "Differential Equation Model of a Chemostat"
+author: "Thomas Petzoldt"
+description: "The example shows a chemostat model by example of an autotrophic organisms, where growth is limited by a single nutrient (e.g. phosphorus) via a Monod equation."
+date: "`r Sys.Date()`"
+bibliography: chemostat.bib
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The example shows a chemostat model [cf. @Novick1950;@Herbert1956] by example of heterotrophic or autotrophic organisms (bacteria, algae, $X$), where growth is limited by a single nutrient (e.g. phosphorus, $P$) via a Monod equation.
+
+## Implementation
+
+The system is solved numerically with solvers from package **deSolve** [@Soetaert2010a], while equilibria at infinite time are estimated with package **rootSolve** [@Soetaert2009]. The implementation follows the standard formulation of these packages, see package documentation of **deSolve** and **rootSolve**, and @Soetaert2010a or @Soetaert2010c for details. 
+The code is written in the **R** programming language for statistical computing [@RCore2018].
+
+```{r, chemostat}
+library("deSolve")
+library("rootSolve")
+
+chemostat <- function(time, init, parms) {
+  with(as.list(c(init, parms)), {
+    mu   <- mumax * P/(kp + P)  # Monod equation
+    dX <- mu * X - D * X
+    dP   <-  D *(P0 - P) - 1/Y * mu * X
+    list(c(dX, dP), mu=mu)
+   })
+}
+parms <- c(
+  mumax = 0.5,    # 1/d
+  kp    = 0.01,   # half saturation constant (mg/L)
+  Y     = 41,     # yield coefficient (stoichiometric C:P ratio)
+  D     = 0.1,    # 1/d
+  P0    = 0.05    # P in inflow (mg/L)
+)
+times <- seq(0, 40, 0.1)  # (d)
+init  <- c(X=0.01, P=0.05) # Phytoplankton C and Phosphorus P (mg/L)
+```
+
+## Dynamic simulation
+
+A dynamic simulation can then be performed by function `ode`, using the default algorithm `lsoda` with automatic integration step size. The result (`out`) is then a matrix-like object of class `deSolve` that is supported by a generic (i.e. object oriented) plot function.
+
+```{r, single, , fig.height=3, fig.width=10}
+out <- ode(init, times, chemostat, parms)
+plot(out, mfrow = c(1, 3))
+```
+
+The plot function allows also to show several scenarios simultanaeously:
+
+```{r, multiple, fig.height=3}
+init  <- c(X=1.0, P=0.05)
+p1 <- p2 <- p3 <- parms
+p1["D"] <- 0; p2["D"] <- 0.3; p3["D"] <- 0.5
+out <- ode(init, times, chemostat, parms)
+out1 <- ode(init, times, chemostat, p1)
+out2 <- ode(init, times, chemostat, p2)
+out3 <- ode(init, times, chemostat, p3)
+
+plot(out, out1, out2, out3, which=c("X", "P"))
+```
+
+## Steady State
+
+The equilibrium can be aproximated numerically with package **rootSolve**. 
+We use a loop here for simplicity, even if list-based approaches (e.g. `lapply`) 
+may appear as more elegant for the intermediate and advanced **R** user.
+
+
+```{r, steadystate, fig.height=3, fig.width=10}
+state <- data.frame(
+  D = seq(0, 0.6, length.out = 100),
+  X = 0,
+  S = 0
+)
+
+init  <- c(X=0.01, P=0.05) 
+
+for (i in 1:nrow(state)) {
+  parms["D"] <- state$D[i]
+  times <- c(0, Inf)
+  out <- runsteady(init, times, chemostat, parms)
+  state[i, 2:3] <- out$y
+}
+
+par(mfrow = c(1, 3))
+plot(S ~ D, data = state, type = "l")
+plot(X ~ D, data = state, type = "l")
+plot(S * X ~ D, data = state, type = "l")
+```
+
+## Analytical Solution
+
+The same equilibrium can be reproduced by the analytical solution of chemostat equations.
+
+```{r analytical, fig.height=3, fig.width=10}
+D <- seq(0, 0.6, length.out = 100)
+mumax = 0.5;  kp    = 0.01; Y     = 41; P0    = 0.05
+
+P <- D * kp / (mumax - D)
+P <- ifelse(D > (mumax * P0)/(kp + P0), P0, P)
+
+X <- Y * (P0 - P)
+
+par(mfrow=c(1,3))
+plot(D, P, type="l")
+plot(D, X, type="l")
+plot(D, X*P, type="l")
+```
+
+## Outlook
+
+The chemostat equations can serve as a starting point for further extensions, e.g. the production of specific substances in bioreactors, or additional trophical levels. The equations are the fundamental for the description of other technical or non-technical flow-through systems, up to waste water treatment plants, or lakes.
+
+
+## References
+
+<div id="refs"></div>
+
+----
