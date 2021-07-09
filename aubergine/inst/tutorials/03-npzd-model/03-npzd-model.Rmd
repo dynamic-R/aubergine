@@ -40,7 +40,8 @@ NPZD <-  function(time, state, parameters){
     PAR            <- 0.5 * (540 + 440 * sin(2 * pi * time/365 - 1.4))
     
     # to avoid errors when DIN becomes slightly negative
-    din            <- max(0, DIN)  
+    #din            <- max(0, DIN)  
+    din <- DIN
     Nuptake        <- maxUptake * PAR/(PAR + ksPAR) * din/(din + ksDIN) * PHYTO
 
     Grazing        <- maxGrazing * PHYTO/(PHYTO + ksGrazing) * ZOO
