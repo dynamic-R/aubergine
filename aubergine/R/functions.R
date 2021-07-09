@@ -1,8 +1,8 @@
 
 
 AUBtutorial <- function(x = c(
-    "01-introduction", 
-    "02-chemostat", 
+    "01-introduction",
+    "02-chemostat",
     "03-npzd-model",
     "04-npz-in-a-river",
     "bacterial-kinetics")) {
@@ -10,8 +10,12 @@ AUBtutorial <- function(x = c(
   LL <- as.character(formals(AUBtutorial)$x[-1])
 
   if (x == "?") {
-    tutorial <- data.frame(x=LL, description = c("About the authors and modelling",
-      "Dynamic modelling in R"))
+    tutorial <- data.frame(x=LL, description =
+      c("About the authors and modelling",
+       "A chemostat model with nutrient limitation",
+       "An NPZD model in a batch culture",
+       "Partial differential equation model in 1D",
+       "A model of bacterial kinetics"))
     return(tutorial)
   } else {
    if (is.character(x))
@@ -27,7 +31,7 @@ AUBtutorial <- function(x = c(
 }
 
 openRmdFile <- function(file, type) {
-  
+
   if (type == "RMD")
      browseURL(file)
   else if (type == "PDF")
@@ -42,14 +46,14 @@ openRmdFile <- function(file, type) {
 }
 
 
-AUBexercise <- function(x = c("npzd", "riverAnoxia"), 
+AUBexercise <- function(x = c("npzd", "riverAnoxia"),
     type = c("HTML", "PDF", "RMD", "WORD")) {
 
   LL <- as.character(formals(AUBexercise)$x[-1])
   type <- match.arg(toupper(type), choices=c("HTML", "PDF", "RMD", "WORD"))
 
   if (x == "?") {
-    exercise <- data.frame(x=LL, description = c( 
+    exercise <- data.frame(x=LL, description = c(
       "NPZD model (marine ecosystem model)",
       "Anoxia in a river (1-D reaction transport model)"))
     return(exercise)
@@ -60,24 +64,24 @@ AUBexercise <- function(x = c("npzd", "riverAnoxia"),
      Which <- LL[x]
    Which <- paste(Which, "/", Which,"_Q", sep="")
 
-  # The files are stored in RMD format 
+  # The files are stored in RMD format
    RMD <- paste0(system.file('exercises', package = 'aubergine'),"/",Which, ".Rmd", sep="")
-   
+
    if (length(RMD) > 1) {
      for (file in RMD) openRmdFile(file, type)
    } else openRmdFile(RMD, type)
-  }   
+  }
 }
 
 # A private function - to be used as aubergine:::AUBanswer
-AUBanswer <- function(x = c("npzd", "riverAnoxia"), 
+AUBanswer <- function(x = c("npzd", "riverAnoxia"),
     type = c("HTML", "PDF", "RMD", "WORD")) {
 
   LL <- as.character(formals(AUBexercise)$x[-1])
   type <- match.arg(toupper(type), choices=c("HTML", "PDF", "RMD", "WORD"))
 
   if (x == "?") {
-    exercise <- data.frame(x=LL, description = c( 
+    exercise <- data.frame(x=LL, description = c(
       "NPZD model (marine ecosystem model)",
       "Anoxia in a river (1-D reaction transport model)"
       ))
@@ -89,12 +93,12 @@ AUBanswer <- function(x = c("npzd", "riverAnoxia"),
      Which <- LL[x]
    Which <- paste(Which, "/", Which, sep="")  # THIS DIFFERS FROM AUBexercise
 
-  # The files are stored in RMD format 
+  # The files are stored in RMD format
    RMD <- paste0(system.file('exercises', package = 'aubergine'),"/",Which, ".Rmd", sep="")
-   
+
    if (length(RMD) > 1) {
      for (file in RMD) openRmdFile(file, type)
    } else openRmdFile(RMD, type)
-  }   
+  }
 }
 
