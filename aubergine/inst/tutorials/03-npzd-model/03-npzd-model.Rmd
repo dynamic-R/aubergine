@@ -3,6 +3,7 @@ title: "Modelling in R: An NPZD Model"
 author: "Karline Soetaert and Thomas Petzoldt"
 description: "This tutorial explains elements of an NPZD model."
 date: "July-2021"
+bibliography: bib.bib
 output: 
   learnr::tutorial:
     progressive: true
@@ -17,4 +18,75 @@ library(learnr)
 
 ## Tutorial
 
-... put text and code here
+The model was taken from [@Soetaert2008] ...
+
+To do: 
+
+- make parameters more realistic
+- adapt notation
+- text and formulae
+- avoid the `max(0, DIN)` construction, can lead to mass balance violation
+
+
+Exercise idea
+
+- implement PAR as forcings
+
+```{r npzd}
+library("deSolve")
+NPZD <-  function(time, state, parameters){
+ with(as.list(c(state, parameters)),{
+    # Light, a sine function; 50% of light is PAR
+    PAR            <- 0.5 * (540 + 440 * sin(2 * pi * time/365 - 1.4))
+    
+    # to avoid errors when DIN becomes slightly negative
+    din            <- max(0, DIN)  
+    Nuptake        <- maxUptake * PAR/(PAR + ksPAR) * din/(din + ksDIN) * PHYTO
+
+    Grazing        <- maxGrazing * PHYTO/(PHYTO + ksGrazing) * ZOO
+    Faeces         <- pFaeces * Grazing
+    Excretion      <- excretionRate * ZOO
+    Mortality      <- mortalityRate * ZOO * ZOO
+    Mineralisation <- mineralisationRate * DETRITUS
+    Chlorophyll    <- chlNratio * PHYTO
+    TotalN         <- PHYTO + ZOO + DETRITUS + DIN
+
+    dPHYTO    <- Nuptake - Grazing
+    dZOO      <- Grazing - Faeces - Excretion - Mortality
+    dDETRITUS <- Mortality - Mineralisation + Faeces
+    dDIN      <- Mineralisation + Excretion - Nuptake
+
+    # the output, packed as a list
+    list(c(dPHYTO, dZOO, dDETRITUS, dDIN),                        # rate of change
+        c(Chlorophyll = Chlorophyll, PAR = PAR, TotalN = TotalN)) # extra outputs
+  })
+}
+
+parms = c(maxUptake          = 1.0,       # /day
+          ksPAR              = 140,       # µEinst/m2/s
+          ksDIN              = 0.5,       # mmolN/m3
+          maxGrazing         = 1.0,       # /day
+          ksGrazing          = 1.0,       # mmolN/m3
+          pFaeces            = 0.3,       # -
+          excretionRate      = 0.1,       # /day
+          mortalityRate      = 0.4,       # /(mmolN/m3)/day
+          mineralisationRate = 0.1,       # /day
+          chlNratio          = 1          # mgChl/mmolN
+)
+times  = seq(from = 0, to = 365, by = 1)  # time step is days
+init   =  c(PHYTO   = 1,                  # state variable initial conditions, units mmolN/m3
+            ZOO     = 0.1,
+            DETRITUS= 5.0,
+            DIN     = 5.0)
+```
+
+```{r npzd-ode, fig.height=8}
+out <- ode(y=init, times=times, func=NPZD, parms=parms)
+plot(out)
+```
+
+## References
+
+<div id="refs"></div>
+
+----
