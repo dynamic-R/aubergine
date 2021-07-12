@@ -1,6 +1,6 @@
 # aubergine
 
-![](hex-aubergine.jpg)
+![](hex-aubergine.jpg | width=100)
 
 A package with teaching material for dynamic simulations in **R**.
 
