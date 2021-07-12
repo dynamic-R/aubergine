@@ -3,12 +3,13 @@
 \alias{AUBexercise}
 \title{Aquatic Modelling Workshop: tutorials and exercises}
 \usage{
-AUBtutorial (x = 
-  c("01-introduction", 
-    "02-chemostat", 
-    "03-npzd-model",
+AUBtutorial (x =
+  c("01-introduction",
+    "02-chemostat",
+    "03-npz-model",
     "04-npz-in-a-river",
-    "bacterial-kinetics"
+    "xx01-npzd-model in a batch",
+    "xx02-bacterial-kinetics"
   )
 )
 
