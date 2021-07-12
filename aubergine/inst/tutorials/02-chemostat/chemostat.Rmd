@@ -1,7 +1,7 @@
 ---
 title: "Modelling in R: A Chemostat"
-author: "Thomas Petzoldt"
-description: "The example shows a chemostat model by example of an autotrophic organisms, where growth is limited by a single nutrient (e.g. phosphorus) via a Monod equation."
+author: "Thomas Petzoldt and Karline Sotaert"
+description: "Tutorial how to extend a chemostat model towards an NPZ model with nutrient, phytoplankton and zooplankton"
 date: "July-2021"
 bibliography: chemostat.bib
 output: 
@@ -114,18 +114,18 @@ plot(N * P ~ d, data = state, type = "l")
 The same equilibrium can be reproduced by the analytical solution of chemostat equations.
 
 ```{r analytical, fig.height=3, fig.width=8}
-# D <- seq(0, 0.6, length.out = 100)
-# r_max = 0.5;  kp = 0.5; Y = 106; N0 = 5
-# 
-# N <- D * kp / (r_max - D)
-# N <- ifelse(D > (r_max * N0)/(kp + N0), N0, N)
-# 
-# P <- Y * (N0 - N)
-# 
-# par(mfrow=c(1, 3))
-# plot(D, N,     type="l")
-# plot(D, P,     type="l")
-# plot(D, N * P, type="l")
+D <- seq(0, 0.6, length.out = 100)
+r <- 0.5;  kp <- 0.5; Y = 106; N0 = 5
+ 
+N <- D * kp / (r - D)
+N <- ifelse(D > (r * N0)/(kp + N0), N0, N)
+ 
+P <- Y * (N0 - N)
+ 
+par(mfrow=c(1, 3))
+plot(D, N,     type="l")
+plot(D, P,     type="l")
+plot(D, N * P, type="l")
 ```
 
 
@@ -141,7 +141,6 @@ The chemostat equations can serve as a starting point for further extensions, e.
 
 
 ```{r chemostat-npz}
-
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
@@ -166,15 +165,14 @@ npz <- function(time, y, parms) {
 parms <- c(
   r_pgrow  = 0.5,   # phytoplankton growth parameter 1/d
   r_zgraz  = 0.4,   # zooplankton grazing parameter 1/d
+  
+  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  c_pn     = 1/106, #stoichiometric conversion from phosporus P to phyto C (P:C ratio)
   asseff   = 0.3,   # zooplankton assimilation efficiency (-)
 
-  km_n = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
-  km_p = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
-
-  c_pn       = 1/106, #stoichiometric conversion from phosporus P to phyto C (P:C ratio)
-
-  d  = 0.1,           # dilution rate 1/d
-  N0 = 5              # P in inflow (mmol/m3)
+  d       = 0.1,    # dilution rate 1/d
+  N0      = 5       # P in inflow (mmol/m3)
 )
 
 times <- seq(0, 40, 0.1)        # (d)
@@ -183,7 +181,7 @@ times <- seq(0, 40, 0.1)        # (d)
 y  <- c(N = 5, P=1, Z = 10)
 
 parms["d"] <- 0.1
-out0 <- ode(init, times, npz, parms)
+out0 <- ode(y, times, npz, parms)
 plot(out0, mfrow = c(1, 3))
 ```
 
@@ -201,40 +199,40 @@ plot(out0, mfrow = c(1, 3))
 ```{r npz-scenario0, fig.height=3, fig.width=8}
 times <- seq(0, 400, 0.1)        # (d)
 parms["d"] <- 0.0
-out0 <- ode(init, times, npz, parms)
+out0 <- ode(y, times, npz, parms)
 plot(out0, mfrow = c(1, 3))
 ```
 
 ```{r npz-scenario1, fig.height=3, fig.width=8}
 parms["d"] <- 0.2
-out1 <- ode(init, times, npz, parms)
+out1 <- ode(y, times, npz, parms)
 plot(out1, mfrow=c(1, 3))
 ```
 
 ```{r npz-scenario2, fig.height=3, fig.width=8}
 parms["d"] <- 0.07
-out2 <- ode(init, times, npz, parms)
+out2 <- ode(y, times, npz, parms)
 plot(out2, mfrow=c(1, 3))
 ```
 
 ```{r npz-scenario3, fig.height=3, fig.width=8}
 times <- seq(0, 1000)
 parms["d"] <- 0.09
-out3 <- ode(init, times, npz, parms)
+out3 <- ode(y, times, npz, parms)
 plot(out3, mfrow=c(1, 3))
 ```
 
 
 ```{r npz-scenario4, fig.height=3, fig.width=8}
 parms["d"] <- 0.5
-out4 <- ode(init, times, npz, parms)
+out4 <- ode(y, times, npz, parms)
 plot(out4, mfrow=c(1, 3))
 ```
 
 ```{r npz-damped, fig.height=3, fig.width=8}
 # scenario X: damped Lotka-Volterra cycle
 parms["d"] <- 0.081
-out5 <- ode(init, times, npz, parms)
+out5 <- ode(y, times, npz, parms)
 plot(out5, mfrow=c(1, 3))
 ```
 
