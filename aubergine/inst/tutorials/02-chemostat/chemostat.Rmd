@@ -36,17 +36,21 @@ library("rootSolve")
 
 chemostat <- function(time, init, parms) {
   with(as.list(c(init, parms)), {
-    r       <- r_max * N/(k + N)  # Monod equation
-    dN_dt   <- D * (N0 - N) - 1/Y * r * P
-    dP_dt   <- r * P - D * P
-    list(c(dN_dt, dP_dt), r = r)
+    p_growth <- p_growmax * N / (km_pgrowth + N) * P
+    n_import <- d * N0
+    n_export <- d * N
+    p_export <- d * P
+    
+    dN_dt   <- n_import - c_pn * p_growth - n_export
+    dP_dt   <- p_growth - p_export
+    list(c(dN_dt, dP_dt), p_growth = p_growth)
    })
 }
 parms <- c(
-  r_max = 0.5,    # 1/d
-  k     = 0.5,    # half saturation constant, P (mol/m3)
-  Y     = 106,    # yield coefficient (stoichiometric C:P ratio)
-  D     = 0.1,    # 1/d
+  p_growmax = 0.5,    # 1/d
+  km_pgrowth     = 0.5,    # half saturation constant, P (mol/m3)
+  c_pn     = 1/106,    # yield = 1/stoichiometric conversion from N to P (C:P ratio)
+  d     = 0.1,    # dilution rate 1/d
   N0    = 5       # P in inflow (mol/m3)
 )
 times <- seq(0, 40, 0.1)        # (d)
@@ -67,7 +71,7 @@ The plot function allows also to show several scenarios simultanaeously:
 ```{r, multiple, fig.height=3}
 init  <- c(N=5, P=10)
 p1 <- p2 <- p3 <- parms
-p1["D"] <- 0; p2["D"] <- 0.3; p3["D"] <- 0.5
+p1["d"] <- 0; p2["d"] <- 0.3; p3["d"] <- 0.5
 out <- ode(init, times, chemostat, parms)
 out1 <- ode(init, times, chemostat, p1)
 out2 <- ode(init, times, chemostat, p2)
@@ -85,7 +89,7 @@ may appear as more elegant for the intermediate and advanced **R** user.
 
 ```{r, steadystate, fig.height=3, fig.width=8}
 state <- data.frame(
-  D   = seq(0.01, 0.6, length.out = 100),
+  d   = seq(0.01, 0.6, length.out = 100),
   N = 0,
   P   = 0
 )
@@ -93,16 +97,16 @@ state <- data.frame(
 init  <- c(N=0.05, P=0.01) 
 
 for (i in 1:nrow(state)) {
-  parms["D"] <- state$D[i]
+  parms["d"] <- state$d[i]
   times <- c(0, Inf)
   out <- runsteady(init, times, chemostat, parms)
   state[i, 2:3] <- out$y
 }
 
 par(mfrow = c(1, 3))
-plot(N     ~ D, data = state, type = "l")
-plot(P     ~ D, data = state, type = "l")
-plot(N * P ~ D, data = state, type = "l")
+plot(N     ~ d, data = state, type = "l")
+plot(P     ~ d, data = state, type = "l")
+plot(N * P ~ d, data = state, type = "l")
 ```
 
 ## Analytical Solution
@@ -139,32 +143,44 @@ The chemostat equations can serve as a starting point for further extensions, e.
 ```{r chemostat-npz}
 chemostat <- function(time, init, parms) {
   with(as.list(c(init, parms)), {
-    r      <- r_max * N / (kp + N)
-    r_z    <- r_max_z * P / (k_X + P)
+ 
+    p_growth <- p_growmax * N / (km_pgrowth + N) * P
+    z_growth <- z_growmax * P / (km_zgrowth + P) * Z
 
-    dN_dt  <- D * (N0 - N) - r * P * 1/Y
-    dP_dt  <- r * P - D * P - r_z * Z * 1/Y_z
-    dZ_dt  <- r_z * Z - D * Z
+    n_import <- d * N0
+    n_export <- d * N
+    p_export <- d * P
+    z_export <- d * Z    
     
+    dN_dt   <- n_import - c_pn * p_growth - n_export
+    dP_dt   <- p_growth - c_zp * z_growth - p_export
+    dZ_dt   <- z_growth - z_export
     
     list(c(dN_dt, dP_dt, dZ_dt))
    })
 }
 parms <- c(
-  r_max = 0.5,    # 1/d
-  kp    = 0.5,    # half saturation constant, P (mol/m3)
-  Y     = 106,    # yield coefficient (stoichiometric C:P ratio)
-  r_max_z = 0.2,  # max growth rate of zooplankton
-  k_X   = 100,    # half sat zoopl. - algae
-  Y_z   = 0.1,    # yield zooplankton
-  D     = 0.1,    # 1/d
-  P0    = 5       # P in inflow (mol/m3)
+  p_growmax  = 0.5,   # max. phytoplankton growth rate 1/d
+  z_growmax  = 0.2,   # max. zooplankton growth rate 1/d
+
+  km_pgrowth = 0.5,   # Monod constant of phyto growth on nutrient (mol/m3)
+  km_zgrowth = 100,   # Monod constant of zoo growth on phyto (mol/m3)
+
+  c_pn       = 1/106, # nutrient demand of phyto (Redfield phosphorus : carbon)
+  c_zp       = 10,    # food demand of zoo (carbon, 10:1)
+  
+  d  = 0.1,           # dilution rate 1/d
+  N0 = 5              # P in inflow (mol/m3)
 )
 
 times <- seq(0, 200, 0.1)        # (d)
 
 # Zoo and Phyto as C and Phosphorus P (mol/m3)
-init  <- c(N=5, P=10, Z = 10)
+init  <- c(N = 5, P=10, Z = 10)
+
+parms["d"] <- 0.1
+out0 <- ode(init, times, chemostat, parms)
+plot(out0, mfrow = c(1, 3))
 ```
 
 ## Scenarios
@@ -178,25 +194,28 @@ init  <- c(N=5, P=10, Z = 10)
 * scneario 5: damped oscillation
 
 
-```{r chemostat-npz-scenarios, fig.height=3, fig.width=8}
-parms["D"] <- 0.0
+```{r chemostat-npz-scenario0, fig.height=3, fig.width=8}
+parms["d"] <- 0.0
 out0 <- ode(init, times, chemostat, parms)
+plot(out0, mfrow = c(1, 3))
+```
 
-parms["D"] <- 0.1
+```{r chemostat-npz-scenarios, fig.height=3, fig.width=8}
+parms["d"] <- 0.1
 out1 <- ode(init, times, chemostat, parms)
 
-parms["D"] <- 0.2
+parms["d"] <- 0.2
 out2 <- ode(init, times, chemostat, parms)
 
-parms["D"] <- 0.5
+parms["d"] <- 0.5
 out4 <- ode(init, times, chemostat, parms)
 
-plot(out0, out1, out2, out4, mfrow=c(1, 3))
+plot(out0, out1, out2, out4, mfrow = c(1, 3))
 ```
 
 ```{r chemostat-npz-coexistence, fig.height=3, fig.width=8}
 times <- seq(0, 2000, 0.1)        # (d)
-parms["D"] <- 0.16
+parms["d"] <- 0.16
 out3 <- ode(init, times, chemostat, parms)
 plot(out4, mfrow=c(1, 3))
 ```
@@ -204,7 +223,7 @@ plot(out4, mfrow=c(1, 3))
 ```{r chemostat-npz-damped, fig.height=3, fig.width=8}
 # scenario X: damped Lotka-Volterra cycle
 times <- seq(0, 2000, 0.1)        # (d)
-parms["D"] <- 0.12
+parms["d"] <- 0.12
 out5 <- ode(init, times, chemostat, parms)
 plot(out5, mfrow=c(1, 3))
 ```
