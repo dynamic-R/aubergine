@@ -38,11 +38,8 @@ NPZD <-  function(time, state, parameters){
  with(as.list(c(state, parameters)),{
     # Light, a sine function; 50% of light is PAR
     PAR            <- 0.5 * (540 + 440 * sin(2 * pi * time/365 - 1.4))
-    
-    # to avoid errors when DIN becomes slightly negative
-    #din            <- max(0, DIN)  
-    din <- DIN
-    Nuptake        <- maxUptake * PAR/(PAR + ksPAR) * din/(din + ksDIN) * PHYTO
+
+    Nuptake        <- maxUptake * PAR/(PAR + ksPAR) * DIN/(DIN + ksDIN) * PHYTO
 
     Grazing        <- maxGrazing * PHYTO/(PHYTO + ksGrazing) * ZOO
     Faeces         <- pFaeces * Grazing

@@ -18,6 +18,19 @@ library(ReacTran)
 
 ## Introduction
 
+The NPZ model implemented in the tutorial before can easily be extended from 0D 
+to 1D. Here it is not necessary to chain code together. Instead, state equations 
+can be vectorized to solve the system state for all grid cells in parallel. 
+
+To make this efficient, function `ode.1D` "knows" that under normal circumstances,
+only adjacent grid cells depend on each other. This makes it possible to
+estimate a banded Jacobian numerically and allows an efficient simulation.
+
+As a second tool, function `tran.1D` from package **ReacTran** can be employed
+to take care of vertical transport.
+
+... write more
+
 ## Exercise
 
 ...

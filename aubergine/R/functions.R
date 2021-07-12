@@ -3,9 +3,10 @@
 AUBtutorial <- function(x = c(
     "01-introduction",
     "02-chemostat",
-    "03-npzd-model",
+    "03-npz-model",
     "04-npz-in-a-river",
-    "bacterial-kinetics")) {
+    "xx01-npzd-model in a batch",
+    "xx02-bacterial-kinetics")) {
 
   LL <- as.character(formals(AUBtutorial)$x[-1])
 
@@ -13,8 +14,9 @@ AUBtutorial <- function(x = c(
     tutorial <- data.frame(x=LL, description =
       c("About the authors and modelling",
        "A chemostat model with nutrient limitation",
-       "An NPZD model in a batch culture",
+       "Extending the Chemostat to an NPZ",
        "Partial differential equation model in 1D",
+       "NPZD model",
        "A model of bacterial kinetics"))
     return(tutorial)
   } else {

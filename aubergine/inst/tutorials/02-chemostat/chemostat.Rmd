@@ -1,7 +1,7 @@
 ---
 title: "Modelling in R: A Chemostat"
 author: "Thomas Petzoldt and Karline Sotaert"
-description: "Tutorial how to extend a chemostat model towards an NPZ model with nutrient, phytoplankton and zooplankton"
+description: "Tutorial: Equilibrium in a Chemostat"
 date: "July-2021"
 bibliography: chemostat.bib
 output: 
@@ -128,113 +128,6 @@ plot(D, P,     type="l")
 plot(D, N * P, type="l")
 ```
 
-
-
-## Exercise: a chemostat with NPZ (work in progress)
-
-* To do: make notation consistent to NPZD model
-
-The chemostat equations can serve as a starting point for further extensions, e.g. the production of specific substances in bioreactors, or additional trophical levels. The equations are the fundamental for the description of other technical or non-technical flow-through systems, up to waste water treatment plants, or lakes. Here we want to go a small step in this direction and implement zooplankton as a third state variable and then test its behaviour.
-
-
-## The model
-
-
-```{r chemostat-npz}
-npz <- function(time, y, parms) {
-  with(as.list(c(y, parms)), {
- 
-    p_growth <- r_pgrow * N / (km_n + N) * P
-    
-    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
-    z_growth     <- asseff * z_grazing
-    n_recycling  <- (1 - asseff) * c_pn * z_grazing
-
-    n_import <- d * N0
-    n_export <- d * N
-    p_export <- d * P
-    z_export <- d * Z    
-    
-    dN_dt   <- n_import - c_pn * p_growth - n_export + n_recycling
-    dP_dt   <- p_growth - z_grazing - p_export
-    dZ_dt   <- z_growth - z_export
-    
-    list(c(dN_dt, dP_dt, dZ_dt))
-   })
-}
-parms <- c(
-  r_pgrow  = 0.5,   # phytoplankton growth parameter 1/d
-  r_zgraz  = 0.4,   # zooplankton grazing parameter 1/d
-  
-  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
-  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
-  c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
-  asseff   = 0.3,   # zooplankton assimilation efficiency (-)
-
-  d       = 0.1,    # dilution rate 1/d
-  N0      = 5       # P in inflow (mmol/m3)
-)
-
-times <- seq(0, 40, 0.1)        # (d)
-
-# Zoo and Phyto as C and Phosphorus P (mol/m3)
-y  <- c(N = 5, P=1, Z = 10)
-
-parms["d"] <- 0.1
-out0 <- ode(y, times, npz, parms)
-plot(out0, mfrow = c(1, 3))
-```
-
-## Scenarios
-
-
-* scenario 0: equilibrium, algae extinct
-* scenario 1: Lotka-Volterra cycle
-* scenario 2: equilibrium, zooplankton extinct
-* scenario 3: equilibrium, coexistence
-* scenario 4: equilibrium, both extinct
-* scneario 5: damped oscillation
-
-
-```{r npz-scenario0, fig.height=3, fig.width=8}
-times <- seq(0, 400, 0.1)        # (d)
-parms["d"] <- 0.0
-out0 <- ode(y, times, npz, parms)
-plot(out0, mfrow = c(1, 3))
-```
-
-```{r npz-scenario1, fig.height=3, fig.width=8}
-parms["d"] <- 0.2
-out1 <- ode(y, times, npz, parms)
-plot(out1, mfrow=c(1, 3))
-```
-
-```{r npz-scenario2, fig.height=3, fig.width=8}
-parms["d"] <- 0.07
-out2 <- ode(y, times, npz, parms)
-plot(out2, mfrow=c(1, 3))
-```
-
-```{r npz-scenario3, fig.height=3, fig.width=8}
-times <- seq(0, 1000)
-parms["d"] <- 0.09
-out3 <- ode(y, times, npz, parms)
-plot(out3, mfrow=c(1, 3))
-```
-
-
-```{r npz-scenario4, fig.height=3, fig.width=8}
-parms["d"] <- 0.5
-out4 <- ode(y, times, npz, parms)
-plot(out4, mfrow=c(1, 3))
-```
-
-```{r npz-damped, fig.height=3, fig.width=8}
-# scenario X: damped Lotka-Volterra cycle
-parms["d"] <- 0.081
-out5 <- ode(y, times, npz, parms)
-plot(out5, mfrow=c(1, 3))
-```
 
 ## References
 
