@@ -4,7 +4,7 @@ Title: Tutorials and exercises for a 1-Day workshop
 Version: 0.1.1
 Author: Karline Soetaert and Thomas Petzoldt
 Maintainer: Karline Soetaert <Karline.Soetaert@nioz.nl>
-Depends: R (>= 3.0), learnr, ReacTran, deSolve, rootSolve
+Depends: R (>= 3.0), learnr, ReacTran, deSolve, rootSolve, future
 Suggests: knitr, rmarkdown, FME
 Description: Tutorials for use in a 1-D modelling workshop organized by AEMON-J. Tutors are Thomas Petzoldt and Karline Soetaert.
 License: GPL (>=3.0)
