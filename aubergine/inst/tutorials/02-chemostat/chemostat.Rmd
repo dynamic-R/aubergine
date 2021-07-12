@@ -34,27 +34,30 @@ The code is written in the **R** programming language for statistical computing 
 library("deSolve")
 library("rootSolve")
 
-chemostat <- function(time, init, parms) {
-  with(as.list(c(init, parms)), {
-    p_growth <- p_growmax * N / (km_pgrowth + N) * P
+chemostat <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+    p_growth <- r_pgrow * N / (k_pn + N) * P
     n_import <- d * N0
     n_export <- d * N
     p_export <- d * P
     
     dN_dt   <- n_import - c_pn * p_growth - n_export
-    dP_dt   <- p_growth - p_export
+    dP_dt   <-                   p_growth - p_export
     list(c(dN_dt, dP_dt), p_growth = p_growth)
    })
 }
 parms <- c(
-  p_growmax = 0.5,    # 1/d
-  km_pgrowth     = 0.5,    # half saturation constant, P (mol/m3)
-  c_pn     = 1/106,    # yield = 1/stoichiometric conversion from N to P (C:P ratio)
+  r_pgrow = 0.5,    # 1/d
+  k_pn     = 0.5,    # half saturation constant, P (mmol/m3)
+  c_pn     = 1/106,    # stoichiometric conversion from N to P (P:C ratio)
   d     = 0.1,    # dilution rate 1/d
-  N0    = 5       # P in inflow (mol/m3)
+  N0    = 5       # P in inflow (mmol/m3)
 )
 times <- seq(0, 40, 0.1)        # (d)
-init  <- c(N = 5, P = 10)    # Phytoplankton C and Phosphorus P (mol/m3)
+y  <- c(N = 5, P = 10)    # Phytoplankton C and Phosphorus P (mmol/m3)
+
+out <- ode(y, times, chemostat, parms)
+plot(out, mfrow=c(1, 3))
 ```
 
 ## Dynamic simulation
@@ -62,20 +65,20 @@ init  <- c(N = 5, P = 10)    # Phytoplankton C and Phosphorus P (mol/m3)
 A dynamic simulation can then be performed by function `ode`, using the default algorithm `lsoda` with automatic integration step size. The result (`out`) is then a matrix-like object of class `deSolve` that is supported by a generic (i.e. object oriented) plot function.
 
 ```{r, single, , fig.height=3, fig.width=8}
-out <- ode(init, times, chemostat, parms)
+out <- ode(y, times, chemostat, parms)
 plot(out, mfrow=c(1, 3))
 ```
 
 The plot function allows also to show several scenarios simultanaeously:
 
 ```{r, multiple, fig.height=3}
-init  <- c(N=5, P=10)
+y  <- c(N=5, P=10)
 p1 <- p2 <- p3 <- parms
 p1["d"] <- 0; p2["d"] <- 0.3; p3["d"] <- 0.5
-out <- ode(init, times, chemostat, parms)
-out1 <- ode(init, times, chemostat, p1)
-out2 <- ode(init, times, chemostat, p2)
-out3 <- ode(init, times, chemostat, p3)
+out  <- ode(y, times, chemostat, parms)
+out1 <- ode(y, times, chemostat, p1)
+out2 <- ode(y, times, chemostat, p2)
+out3 <- ode(y, times, chemostat, p3)
 
 plot(out, out1, out2, out3, which=c("N", "P"))
 ```
@@ -94,12 +97,12 @@ state <- data.frame(
   P   = 0
 )
 
-init  <- c(N=0.05, P=0.01) 
+y  <- c(N=0.05, P=0.01) 
 
 for (i in 1:nrow(state)) {
   parms["d"] <- state$d[i]
   times <- c(0, Inf)
-  out <- runsteady(init, times, chemostat, parms)
+  out <- runsteady(y, times, chemostat, parms)
   state[i, 2:3] <- out$y
 }
 
@@ -141,11 +144,16 @@ The chemostat equations can serve as a starting point for further extensions, e.
 
 
 ```{r chemostat-npz}
-chemostat <- function(time, init, parms) {
-  with(as.list(c(init, parms)), {
+
+chemostat <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
  
-    p_growth <- p_growmax * N / (km_pgrowth + N) * P
-    z_growth <- z_growmax * P / (km_zgrowth + P) * Z
+    p_growth <- r_pgrow * N / (k_pn + N) * P
+    
+    z_ingest    <- r_zing  * P / (k_zp + P) * Z
+    z_growth    <- c_asseff * z_ingest
+    n_recycling <- (1 - c_asseff) * z_ingest
+    
 
     n_import <- d * N0
     n_export <- d * N
@@ -153,32 +161,35 @@ chemostat <- function(time, init, parms) {
     z_export <- d * Z    
     
     dN_dt   <- n_import - c_pn * p_growth - n_export
-    dP_dt   <- p_growth - c_zp * z_growth - p_export
+    dP_dt   <- p_growth - z_growth - p_export
     dZ_dt   <- z_growth - z_export
     
     list(c(dN_dt, dP_dt, dZ_dt))
    })
 }
 parms <- c(
-  p_growmax  = 0.5,   # max. phytoplankton growth rate 1/d
-  z_growmax  = 0.2,   # max. zooplankton growth rate 1/d
+  r_pgrow  = 0.5,   # phytoplankton growth parameter 1/d
+  r_zing   = 0.2,   # zooplankton growth parameter 1/d
+  
+  c_pn     = 1/106,
+  c_asseff    = 0.3,   # zooplankton assimilation efficiency
 
-  km_pgrowth = 0.5,   # Monod constant of phyto growth on nutrient (mol/m3)
-  km_zgrowth = 100,   # Monod constant of zoo growth on phyto (mol/m3)
+  k_pn = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  k_zp = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
 
   c_pn       = 1/106, # nutrient demand of phyto (Redfield phosphorus : carbon)
-  c_zp       = 10,    # food demand of zoo (carbon, 10:1)
-  
+
   d  = 0.1,           # dilution rate 1/d
-  N0 = 5              # P in inflow (mol/m3)
+  N0 = 5              # P in inflow (mmol/m3)
 )
 
 times <- seq(0, 200, 0.1)        # (d)
 
 # Zoo and Phyto as C and Phosphorus P (mol/m3)
-init  <- c(N = 5, P=10, Z = 10)
+y  <- c(N = 5, P=10, Z = 10)
 
 parms["d"] <- 0.1
+#parms["c_asseff"] <- 1/10
 out0 <- ode(init, times, chemostat, parms)
 plot(out0, mfrow = c(1, 3))
 ```
