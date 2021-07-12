@@ -1,5 +1,5 @@
 ---
-title: "Modelling in R: An NPZ in a River"
+title: "Modelling in R: 1D NPZ in a River"
 author: "Karline Soetaert and Thomas Petzoldt"
 description: "This tutorial explains elements of a 1D Model in a River."
 date: "July-2021"
@@ -81,7 +81,8 @@ P_init  <- rep(100, times=nbox) # mmolC/m3
 Z_init  <- rep(10,  times=nbox) # mmolC/m3
 y_init  <- c(N_init, P_init, Z_init)
 
-## clone the parameter vector for future modification
+## clone the parameter vector and create scenarios
+#system.time({
 parms2 <- parms1 <- parms
 
 parms["v"] <- 1000  # (m/d)
@@ -97,4 +98,47 @@ std2 <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms2,
                   nspec=3, names=c("N","P","Z"), method="runsteady")
 
 plot(std0, std1, std2, mfrow=c(3,1), grid=Grid$x.mid/1000, lty=1, lwd=2, xlab="km")
+#})
 ```
+
+
+## A Goody at the end: Parallel execution with `future`
+
+We have seen that computation took a while, and if we go through the script line by
+line, we may consider to wait before we enter the next part. Here we can ask: Why not running the simulation in the background or Why not running the three scenarios in parallel on our multiprocessor machine? 
+
+This is indeed possible and R has different mechanisms for this, one intriguingly 
+simple is provided by package **future**. In the following, we enclose the
+simulations in curly brackets and use the `%<-%` operator instead of the common `<-`.
+
+Before that, we set a `plan` that **R** should run this in multiple sessions.
+
+What does it do? After entering sich a code segment, R gives control back to the user,
+and starts simulation in a separate R worker process in the background.
+This can then be done for all three scenarios one after each other, because its results (`std0` ... `std2`) are not yet needed for the next step. They are eventually needed "in the future" for the `plot` function, so R does not need to return the results immediately.
+
+
+```{r river-npz-future, fig.height=8, fig.width=8}
+library("future")
+system.time({
+plan(strategy="multisession")
+parms["v"] <- 1000  # (m/d)
+std0 %<-% {steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
+                     nspec=3, names=c("N","P","Z"), method="runsteady")}
+
+parms1["v"] <- 5000  # m/d
+std1 %<-% {steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms1,
+                     nspec=3, names=c("N","P","Z"), method="runsteady")}
+
+parms2["v"] <- 10000 # m/d
+std2 %<-% {steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms2,
+                     nspec=3, names=c("N","P","Z"), method="runsteady")}
+
+plot(std0, std1, std2, mfrow=c(3,1), grid=Grid$x.mid/1000, lty=1, lwd=2, xlab="km")
+plan(strategy="sequential") # return to the default plan and close the workers
+})
+```
+
+The normal version took 11s and the "future" version 6s on my PC.
+
+
