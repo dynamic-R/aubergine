@@ -14,9 +14,18 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(learnr)
+library(knitr)
 ```
 
+
 ## Introduction
+
+**Note:** Though the following example is somewhat fragmentary, it is included 
+for two reasons:
+
+* to give a practical example how models can be driven with forcing data
+* to point to the "Practical Guide to Ecological Modelling"-book with more related
+examples.
 
 The model is a minimally modified version taken from [@Soetaert2008] and 
 it is also found online at [the book homepage](https://www.springer.com/gp/book/9781402086236).
@@ -91,28 +100,29 @@ plot(out)
 
 Let's assume we have a table of PAR data:
 
-```{r npzd-sin}
-time <- seq(1, 365, length.out=24)
-PAR  <- PAR            <- 0.5 * (540 + 440 * sin(2 * pi * time/365 - 1.4))
+```{r npzd-inputs-create}
+time <- round(seq(1, 365, length.out=25), 0)
+PAR  <- round(0.5 * (540 + 440 * sin(2 * pi * time/365 - 1.4)), 0)
 inputs <- data.frame(
   time = time,
   PAR  = PAR
 )
 ```
 
-```{r npzd-sin}
+```{r npzd-inputs-show}
 kable(inputs)
 ```
 
 
 
 
-```{r npzd-sin}
+```{r npzd-approxfun}
 library("deSolve")
 NPZD <-  function(time, state, parameters){
  with(as.list(c(state, parameters)),{
     # Light, a sine function; 50% of light is PAR
-    PAR            <- 0.5 * (540 + 440 * sin(2 * pi * time/365 - 1.4))
+    #PAR            <- 0.5 * (540 + 440 * sin(2 * pi * time/365 - 1.4))
+    PAR <- parfunction(time)
 
     Nuptake        <- maxUptake * PAR/(PAR + ksPAR) * DIN/(DIN + ksDIN) * PHYTO
 
@@ -153,13 +163,49 @@ init   =  c(PHYTO   = 1,                  # state variable initial conditions, u
             DIN     = 5.0)
 ```
 
-```{r npzd-ode, fig.height=8}
+Now lets define an interpolation funtion. Here we use R's `approxfun`, that is a 
+function that returns a function. It is technically callled a "closure", because
+the data used during creation become part of it.
+
+It can then be called with a given time and returns the interpolated dependent 
+variable (PAR):
+
+```{r npzd-ode-approxfun, fig.height=8}
+parfunction <- approxfun(x=inputs$time, y=inputs$PAR, rule=2)
+parfunction(56)
+```
+
+
+```{r npzd-ode2, fig.height=8}
 out <- ode(y=init, times=times, func=NPZD, parms=parms)
 plot(out)
 ```
 
+In the code above, `parfunction` is passed to the model function as a global 
+variable. If you, however like to pass it explicitly to the model, add an additional 
+parameter to the function, e.g.:
 
-## References
+```
+## in the model function
+NPZD <-  function(time, state, parameters, parfunction) {
+
+...
+
+}
+
+## and in the call
+out <- ode(y=init, times=times, func=NPZD, parms=parms, parfunction=parfunction)
+```
+
+## Outlook
+
+More information about the model is found in [@Soetaert2008], and how to use 
+forcings in the "forcings" help (`help("forcings")`) page of 
+the **deSolve** package and the tutorial at [https://tpetzoldt.github.io](https://tpetzoldt.github.io/deSolve-forcing/deSolve-forcing.html).
+
+
+
+### References
 
 <div id="refs"></div>
 

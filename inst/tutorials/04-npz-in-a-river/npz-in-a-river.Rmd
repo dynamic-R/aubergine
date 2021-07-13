@@ -3,6 +3,7 @@ title: "Modelling in R: 1D NPZ in a River"
 author: "Karline Soetaert and Thomas Petzoldt"
 description: "This tutorial explains elements of a 1D Model in a River."
 date: "July-2021"
+bibliography: bib.bib
 output: 
   learnr::tutorial:
     progressive: true
@@ -19,7 +20,7 @@ library(ReacTran)
 ## Introduction
 
 The NPZ model implemented in the previous tutorial can easily be extended from 0D 
-to 1D, using the R-package **ReacTran**. Basically, 
+to 1D, using the R-package **ReacTran** [@Soetaert2012ReacTran]. Basically, 
 
 * the spatial domain is subdivided in a number of grid cells (function `setup.grid.1D`), and 
 * the state equations are vectorized so that they are solved for all grid cells in parallel.
@@ -279,11 +280,16 @@ legend("top", title="v=", legend=c("1km/d","5km/d","10km/d"),
 The 1D-NPZ model shows how straightforward transport can be implemented. We used 
 the "method of lines" where space is discretized in fixed steps while time is
 solved with standard solvers in variable time steps. This works for many problems,
-even in 2D and 3D, but there are of course also specialized cases where other
-methods are preferred.
+even in 2D and 3D [cf. @Soetaert2008;@Soetaert2012], but there are of course also 
+specialized cases where other methods are preferred.
 
 The model described here can be seen as a starting point for more complex 
 applications, e.g. with seasonal (or diurnal) forcing, variable river geometry,
 vertical exchange in the weater column of lakes or in the sediment and of course 
 also for completely different problems in other fields.
 
+### References
+
+<div id="refs"></div>
+
+----
