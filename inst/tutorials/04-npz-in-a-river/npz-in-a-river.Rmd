@@ -18,69 +18,212 @@ library(ReacTran)
 
 ## Introduction
 
-The NPZ model implemented in the tutorial before can easily be extended from 0D 
-to 1D. Here it is not necessary to chain code together. Instead, state equations 
-can be vectorized to solve the system state for all grid cells in parallel. 
+The NPZ model implemented in the previous tutorial can easily be extended from 0D 
+to 1D, using the R-package **ReacTran**. Basically, 
 
-To make this efficient, function `ode.1D` "knows" that under normal circumstances,
-only adjacent grid cells depend on each other. This makes it possible to
-estimate a banded Jacobian numerically and allows an efficient simulation.
+* the spatial domain is subdivided in a number of grid cells (function `setup.grid.1D`), and 
+* the state equations are vectorized so that they are solved for all grid cells in parallel.
+* transport (advective flow and mixing) is performed by function `tran.1D`
+* the numerical methods `ode.1D` and `steady.1D` from **deSolve** and **rootSolve** are optimised to solve one-dimensional transport problems.\footnote{`ode.1D` and `steady.1D` know the structure of the Jacobian to be 'banded' (as only adjacent grid cells depend on each other), making it possible to efficiently estimate the Jacobian}
 
-As a second tool, function `tran.1D` from package **ReacTran** can be employed
-to take care of vertical transport.
+## From 0D to 1D
 
-... write more
+We start with the 0D chemostat model from previous tutorial that describes the 
+dynamics of Nutrients and Phytoplankton:
 
-## Exercise
+```{r, chemostatNP}
+library (deSolve)
+chemostatNP <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+    p_growth <- r_pgrow * N / (km_n + N) * P
+    
+  # mass balance = process rates   + transport
+    dN_dt   <-  - c_pn * p_growth + d*(N0-N)
+    dP_dt   <-           p_growth + d*(0 -P)
+    list(c(dN_dt, dP_dt))
+   })
+}
+parms<- c(r_pgrow=0.5, km_n=1.0, c_pn=1/106, d=0.1, N0=5)
+y    <- c(N = 5, P = 1)  
+std  <- steady(y, times=c(0,Inf), func=chemostatNP, parms=parms,
+                method="runsteady") # solve model
+std$y
+```
 
-...
+The code below shows how this zero-dimensional NP model is extended to 1D.
 
+```{r river-np, fig.height=4, fig.width=8}
+library(ReacTran)                                               ## CHANGED ##
 
-## Solution
+riverNP <- function(time, y, parms) {
+  with(as.list(parms), {    # was:  as.list(c(y, parms))        ## CHANGED ##
+   # state vectors need to be extracted from y                  ## NEW ##
+    N <- y[        1 :(1*nbox)]   
+    P <- y[(1*nbox+1):(2*nbox)]   
 
-```{r river-npz, fig.height=8, fig.width=8}
+    p_growth  <- r_pgrow * N / (km_n + N) * P
+
+   # transport: C.up=upstream conc, v=flow velocity             ## NEW ##
+    n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)  
+    p_transport <- tran.1D(C=P, C.up=P0, v=v, dx=Grid)
+
+   # mass balance = process rates + transport
+    dN_dt <- c_pn * (-p_growth)  + n_transport$dC               ## CHANGED ##
+    dP_dt <-          p_growth   + p_transport$dC
+
+    list(c(dN_dt, dP_dt))
+  })
+}
+parms <- c(
+  r_pgrow = 0.5,   # phytoplankton growth parameter (1/d)
+  km_n    = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
+  km_p    = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
+  c_pn    = 1/106, # conversion from phosporus to phyto (P:C)
+  v       = 10000, # flow velocity (m/d)                        ## NEW ##
+  N0      = 500,   # nutrient (PO4) in inflow (mmolP/m3)    
+  P0      = 10     # algae in inflow (mmolC/m3)
+)
+
+# morphology: divide the river into 500 boxes                   ## NEW ##
+Length <- 500e3  # length of the river (m)
+nbox   <- 500    # number of 1D grid cells
+Grid   <- setup.grid.1D(L = Length, N = nbox)
+
+# Phyto as C and Phosphorus P (mol/m3) - each nbox long         ## CHANGED ##
+N_init  <- rep(5, times=nbox)  # mmolP/m3
+P_init  <- rep(1, times=nbox) # mmolC/m3
+y_init  <- c(N_init, P_init)
+
+std <- steady.1D(y_init, times=c(0,Inf), func=riverNP, parms=parms,
+                 nspec=2, names=c("N","P"),                     ## NEW ##
+                 method="runsteady")
+plot(std, mfrow=c(1,2), grid=Grid$x.mid/1000,                   ## CHANGED ## 
+     lty=1, lwd=2, xlab="km")
+```
+
+## The 1D NPZ model
+
+You now get the extended NPZ model in the chemostat:
+
+```{r, chemostatNPZ}
+library (deSolve)
+chemostatNPZ <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+    p_growth  <- r_pgrow * N / (km_n + N) * P
+    z_grazing <- r_zgraz * P / (km_p + P) * Z
+    z_loss    <- r_zloss * Z
+  # mass balance = process rates   + transport
+    dN_dt <- c_pn*(-p_growth + (1-asseff)*z_grazing + z_loss) +d*(N0-N)
+    dP_dt <-        p_growth -            z_grazing           +d*(0 -P)
+    dZ_dt <-                      asseff *z_grazing - z_loss  +d*(0 -Z)
+    list(c(dN_dt, dP_dt, dZ_dt))
+   })
+}
+parms<- c(r_pgrow=0.5, r_zgraz=0.4, r_zloss=0.01, km_n=0.5, 
+          km_p=100, c_pn=1/106, asseff=0.3, d=0.11, N0=500)
+y   <- c(N=5, P=1, Z=1)  
+std <- steady(y, times=c(0,Inf), func=chemostatNPZ, parms=parms, method="runsteady") 
+```
+
+Your task is to extend the NPriver model to include the Z component:
+```{r riverNPZ, exercise=TRUE, exercise.lines=30, fig.height=4, fig.width=8}
+library(ReacTran)           
+
+riverNPZ <- function(time, y, parms) {
+  with(as.list(parms), {    
+   # state vectors need to be extracted from y                 
+    N <- y[        1 :(1*nbox)]   
+    P <- y[(1*nbox+1):(2*nbox)]   
+    Z <- ..                                                     ## CHANGE ##
+    
+    p_growth  <- r_pgrow * N / (km_n + N) * P
+    z_grazing <- ...                                            ## ADD ##
+    z_loss    <- ...                                            ## ADD ##
+
+   # transport: C.up=upstream conc, v=flow velocity              
+    n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)  
+    p_transport <- tran.1D(C=P, C.up=P0, v=v, dx=Grid)
+    z_transport <- ..                                           ## ADD ##
+    
+   # mass balance = process rates + transport
+    dN_dt <- c_pn * (-p_growth)  + n_transport$dC               ## CHANGE ##
+    dP_dt <-          p_growth   + p_transport$dC               ## CHANGE ##
+    dZ_dt <- ..                                                 ## ADD ##
+
+    list(c(dN_dt, dP_dt, ..))                                   ## CHANGE ##
+  })
+}
+parms <- c(
+  r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz  = 0.4,   # zooplankton ingestion parameter (1/d)
+  r_zloss  = 0.01,  # zooplankton loss parameter (1/d)
+
+  km_n     = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
+  km_p     = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
+  c_pn     = 1/106, # conversion from phosporus P to phyto C (P:C)
+  asseff   = 0.3,   # assimilation efficiency of zoo (-)
+
+  v        = 10000, # flow velocity (m/d)
+  N0       = 500,   # nutrient (PO4) in inflow (mmolP/m3)
+  P0       = 10,    # algae in inflow (mmolC/m3)
+  Z0       = 1      # zooplankton in inflow (mmolC/m3)
+)
+
+# river morphology
+Length <- 500e3  # length of the river (m)
+nbox   <- 500    # number of 1D grid cells
+Grid   <- setup.grid.1D(L = Length, N = nbox)
+
+# Zoo and Phyto as C and Phosphorus P (mol/m3)
+N_init  <- rep(500, times=nbox) # mmolP/m3
+P_init  <- rep(100, times=nbox) # mmolC/m3
+Z_init  <- ..                                                   ## ADD ##
+y_init  <- c(N_init, P_init, ..)                                ## ADD ##
+
+std <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
+                 nspec=2, names=c("N","P"),                     ## CHANGE ##
+                 method="runsteady")
+plot(std, mfrow=c(1,3), grid=Grid$x.mid/1000, xlab="km")
+```
+
+```{r riverNPZ-solution, fig.height=4, fig.width=8}
 library(ReacTran)
 
 riverNPZ <- function(time, y, parms) {
   with(as.list(parms), {
     N <- y[       1  :   nbox ]
     P <- y[(  nbox+1):(2*nbox)]
-    Z <- y[(2*nbox+1):(3*nbox)]
+    Z <- y[(2*nbox+1):(3*nbox)]                            ## ADDED ##
 
     p_growth  <- r_pgrow * N / (km_n + N) * P
-    z_grazing <- r_zgraz * P / (km_p + P) * Z
-    z_loss    <- r_zloss * Z
+    z_grazing <- r_zgraz * P / (km_p + P) * Z              ## ADDED ##
+    z_loss    <- r_zloss * Z                               ## ADDED ##   
 
-    n_transport <- tran.1D(C=N, C.up=N.up, v=v, dx=Grid)
-    p_transport <- tran.1D(C=P, C.up=P.up, v=v, dx=Grid)
-    z_transport <- tran.1D(C=Z, C.up=Z.up, v=v, dx=Grid)
+    n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)
+    p_transport <- tran.1D(C=P, C.up=P0, v=v, dx=Grid)
+    z_transport <- tran.1D(C=Z, C.up=Z0, v=v, dx=Grid)     ## ADDED ##
 
-    n_import <- n_transport$flux.up   # in [mmol/m2/d]
-    n_export <- n_transport$flux.down
+    dN_dt <- c_pn*(-p_growth + (1-asseff)*z_grazing + z_loss) + n_transport$dC
+    dP_dt <-        p_growth -            z_grazing           + p_transport$dC
+    dZ_dt <-                 +    asseff *z_grazing - z_loss  + z_transport$dC
 
-    dN_dt <- c_pn * (-p_growth + (1-asseff) * z_grazing + z_loss) + n_transport$dC
-    dP_dt <-         p_growth -               z_grazing           + p_transport$dC
-    dZ_dt <-                  +     asseff *  z_grazing - z_loss  + z_transport$dC
-
-    list(c(dN_dt, dP_dt, dZ_dt),
-         n_import=n_import, n_export=n_export,
-         meanN=mean(N), meanP=mean(P), meanZ=mean(Z))
+    list(c(dN_dt, dP_dt, dZ_dt))
   })
 }
 parms <- c(
-  r_pgrow    = 0.5,   # phytoplankton growth parameter (1/d)
-  r_zgraz    = 0.4,   # zooplankton ingestion parameter (1/d)
-  r_zloss    = 0.01,  # zooplankton loss parameter (1/d)
+  r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz  = 0.4,   # zooplankton ingestion parameter (1/d)
+  r_zloss  = 0.01,  # zooplankton loss parameter (1/d)
 
-  km_n       = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
-  km_p       = 100,   # Monod constant of zoo grazing on phyto (mmol/m3)
-  c_pn       = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C)
-  asseff     = 0.3,   # assimilation efficiency of zoo (-)
+  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  km_p     = 100,   # Monod constant of zoo grazing on phyto (mmol/m3)
+  c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C)
+  asseff   = 0.3,   # assimilation efficiency of zoo (-)
 
-  v          = 10000, # flow velocity (m/d)
-  N.up       = 500,   # nutrient (PO4) in inflow (mmolP/m3)
-  P.up       = 10,    # algae in inflow (mmolC/m3)
-  Z.up       = 1      # zooplankton in inflow (mmolC/m3)
+  v        = 10000, # flow velocity (m/d)
+  N0       = 500,   # nutrient (PO4) in inflow (mmolP/m3)
+  P0       = 10,    # algae in inflow (mmolC/m3)
+  Z0       = 1      # zooplankton in inflow (mmolC/m3)
 )
 
 # river morphology
@@ -94,12 +237,27 @@ P_init  <- rep(100, times=nbox) # mmolC/m3
 Z_init  <- rep(10,  times=nbox) # mmolC/m3
 y_init  <- c(N_init, P_init, Z_init)
 
-## clone the parameter vector and create scenarios
-#system.time({
-parms2 <- parms1 <- parms
+std <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
+                 nspec=3, names=c("N","P","Z"), method="runsteady")
+plot(std, mfrow=c(1,3))
+```
 
-parms["v"] <- 1000  # (m/d)
-std0 <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
+## The 1D NPZ model - scenarios
+
+The river model with nutrient, phytoplankton and zooplankton dynamics is now run
+with different flow rates. 
+
+The model function is repeated first:
+```{r, fig.height=5, fig.width=8}
+<<riverNPZ-solution>>
+```
+
+Flow rates are varied from 1 km /day up to 10 km per day:
+
+```{r riverNPZscenario, fig.height=8, fig.width=8}
+parms0 <- parms1 <- parms2 <- parms
+parms0["v"] <- 1000  # m/d
+std0 <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms0,
                   nspec=3, names=c("N","P","Z"), method="runsteady")
 
 parms1["v"] <- 5000  # m/d
@@ -110,48 +268,11 @@ parms2["v"] <- 10000 # m/d
 std2 <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms2,
                   nspec=3, names=c("N","P","Z"), method="runsteady")
 
-plot(std0, std1, std2, mfrow=c(3,1), grid=Grid$x.mid/1000, lty=1, lwd=2, xlab="km")
-#})
+plot(std0, std1, std2, mfrow=c(3,1), grid=Grid$x.mid/1000, 
+     lty=1, lwd=2, xlab="km")
+legend("top", title="v=", legend=c("1km/d","5km/d","10km/d"), 
+       col=1:3, lty=1)
 ```
 
-
-## A Goody at the end: Parallel execution with `future`
-
-We have seen that computation took a while, and if we go through the script line by
-line, we may consider to wait before we enter the next part. Here we can ask: Why not running the simulation in the background or Why not running the three scenarios in parallel on our multiprocessor machine? 
-
-This is indeed possible and R has different mechanisms for this, one intriguingly 
-simple is provided by package **future**. In the following, we enclose the
-simulations in curly brackets and use the `%<-%` operator instead of the common `<-`.
-
-Before that, we set a `plan` that **R** should run this in multiple sessions.
-
-What does it do? After entering sich a code segment, R gives control back to the user,
-and starts simulation in a separate R worker process in the background.
-This can then be done for all three scenarios one after each other, because its results (`std0` ... `std2`) are not yet needed for the next step. They are eventually needed "in the future" for the `plot` function, so R does not need to return the results immediately.
-
-
-```{r river-npz-future, fig.height=8, fig.width=8}
-library("future")
-system.time({
-plan(strategy="multisession")
-parms["v"] <- 1000  # (m/d)
-std0 %<-% {steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
-                     nspec=3, names=c("N","P","Z"), method="runsteady")}
-
-parms1["v"] <- 5000  # m/d
-std1 %<-% {steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms1,
-                     nspec=3, names=c("N","P","Z"), method="runsteady")}
-
-parms2["v"] <- 10000 # m/d
-std2 %<-% {steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms2,
-                     nspec=3, names=c("N","P","Z"), method="runsteady")}
-
-plot(std0, std1, std2, mfrow=c(3,1), grid=Grid$x.mid/1000, lty=1, lwd=2, xlab="km")
-plan(strategy="sequential") # return to the default plan and close the workers
-})
-```
-
-The normal version took 11s and the "future" version 6s on my PC.
 
 
