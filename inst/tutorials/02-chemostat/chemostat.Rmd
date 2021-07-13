@@ -38,10 +38,10 @@ the symbol for the nutrient **N** does not necessarily mean that it is nitrogen.
 
 The equations governing the dynamics of **P** and **N** are:
 $$
-\frac{dN}{dt}=-r \times \frac{N}{km_n+N}\times P + d \times(N_0-N)
+\frac{dN}{dt}=-r \cdot \frac{N}{km_n+N}\cdot P + d \cdot(N_0-N)
 $$
 $$
-\frac{dP}{dt}=r \times \frac{N}{km_n+N}\times P + d \times(0-P)
+\frac{dP}{dt}=r \cdot \frac{N}{km_n+N}\cdot P + d \cdot(0-P)
 $$
 where d is the dilution rate, and the nutrient and phytoplankton concentration in the inflowing water is $N_0$ and $0$ respectively. 
 
@@ -59,12 +59,9 @@ library("rootSolve")
 chemostat <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
     p_growth <- r_pgrow * N / (km_n + N) * P
-    n_import <- d * N0
-    n_export <- d * N
-    p_export <- d * P
-    
-    dN_dt   <- n_import - c_pn * p_growth - n_export
-    dP_dt   <-                   p_growth - p_export
+
+    dN_dt   <- - c_pn * p_growth - d * (N0 - N)
+    dP_dt   <-          p_growth - d * (0 - P)
     list(c(dN_dt, dP_dt), p_growth = p_growth)
    })
 }
@@ -81,7 +78,7 @@ parms <- c(
 
 A dynamic simulation can then be performed by function `ode`, using the default algorithm `lsoda` with automatic integration step size. The result (`out`) is  a matrix-like object of class `deSolve` that is supported by a generic (i.e. object oriented) plot function.
 
-```{r, single, , fig.height=3, fig.width=8}
+```{r, single, fig.height=3, fig.width=8}
 times <- seq(from=0, to=40, length.out=100)  # simulation time (d)
 y     <- c(N = 5, P = 1)                     # Nutrient (mmolP/m3) and Phytoplankton (mmolC/m3)
 out   <- ode(y, times, chemostat, parms)
