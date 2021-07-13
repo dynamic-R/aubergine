@@ -45,12 +45,9 @@ library("rootSolve")
 chemostat <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
     p_growth <- r_pgrow * N / (km_n + N) * P
-    n_import <- d * N0
-    n_export <- d * N
-    p_export <- d * P
-    
-    dN_dt   <- n_import - c_pn * p_growth - n_export
-    dP_dt   <-                   p_growth - p_export
+
+    dN_dt   <- -c_pn * p_growth + d * (N0 - N)
+    dP_dt   <-        p_growth - d * P
     list(c(dN_dt, dP_dt), p_growth = p_growth)
    })
 }
@@ -79,30 +76,58 @@ plants, or lakes.
 Here we implement zooplankton as a third state variable and then test
 the behaviour of this more complex model.
 
+Following the equations of $P$ and $N$ of the chemostat:
 
-## The NPZ model
+\begin{align}
+\frac{dN}{dt} &= -r \cdot \frac{N}{km_n+N}\cdot P + d \cdot (N_0-N) \\
+\frac{dP}{dt} &=  r \cdot \frac{N}{km_n+N}\cdot P + d \cdot (0-P)
+\end{align}
+
+we can add a 3rd equation for zooplankton $Z$ as:
+
+\begin{align}
+\frac{dZ}{dt} &= c_{asseff} \cdot c_{pn} \cdot r_{zgraz} \cdot \frac{P}{km_P + P} - r_{zloss} \cdot Z - d \cdot Z
+\end{align}
+
+with $c_{asseff}$ = assimilation efficiency, $r_{zgraz}$ = zooplankton grazing 
+parameter, $r_{zloss}$ = zooplankton loss parameter, and $km_P$ = Monod constant 
+of zooplankton growth on phytoplankton. Units and parameter values are found in the
+code below.
 
 
-```{r chemostat-npz}
+Let's also assume, that nutrients from unused food $(1-c_{asseff})$ are recycled, 
+so we can write the full system:
+
+\begin{align}
+    p_{growth}    &= r_{pgrow} \cdot \frac{N}{km_n + N}  \cdot P\\
+    z_{grazing}   &= r_{zgraz}  \cdot \frac{P}{km_p + P} \cdot Z\\
+    z_{growth}    &= c_{asseff} \cdot z_{grazing}\\
+    n_{recycling} &= (1 - c_{asseff}) \cdot z_{grazing}\\
+    \\
+    \text{and the state equations:}\\
+    \frac{dN}{dt}   &= c_{pn} \cdot (-p_{growth} + n_{recycling}) + d \cdot (N_0 - N)\\
+    \frac{dP}{dt}   &= p_{growth} - z_{grazing}             - d \cdot P\\
+    \frac{dZ}{dt}   &= z_{growth} - r_{zloss}  \cdot Z      - d \cdot Z
+\end{align}
+
+
+### Implementation of the NPZ model
+
+```{r chemostat-npz, exercise=TRUE, exercise.lines = 25}
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
-    p_growth <- r_pgrow * N / (km_n + N) * P
+    p_growth     <- r_pgrow * N / (km_n + N) * P
     
-    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
-    z_growth     <- asseff * z_grazing
-    n_recycling  <- (1 - asseff) * c_pn * z_grazing
+    z_grazing    <- ...
+    z_growth     <- ...
+    n_recycling  <- ...
 
-    n_import <- d * N0
-    n_export <- d * N
-    p_export <- d * P
-    z_export <- d * Z    
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- ...
     
-    dN_dt   <- n_import - c_pn * p_growth - n_export + n_recycling
-    dP_dt   <- p_growth - z_grazing - p_export
-    dZ_dt   <- z_growth - z_export
-    
-    list(c(dN_dt, dP_dt, dZ_dt))
+    list(c(dN_dt, dP_dt, ...))
    })
 }
 parms <- c(
@@ -113,7 +138,7 @@ parms <- c(
   km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
   km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
   c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
-  asseff   = 0.3,   # zooplankton assimilation efficiency (-)
+  c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
 
   d       = 0.1,    # dilution rate (1/d)
   N0      = 5       # P in inflow (mmol/m3)
@@ -128,6 +153,109 @@ parms["d"] <- 0.1
 out0 <- ode(y, times, npz, parms)
 plot(out0, mfrow = c(1, 3))
 ```
+
+```{r chemostat-npz-hint-1, exercise.lines = 1}
+list(c(dN_dt, dP_dt, dZ_dt))
+```
+
+```{r chemostat-npz-hint-2, exercise.lines = 4}
+    p_growth     <- r_pgrow * N / (km_n + N) * P
+    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_growth     <- c_asseff * z_grazing
+    n_recycling  <- (1 - c_asseff) * z_grazing
+```
+
+```{r chemostat-npz-hint-3,  exercise.lines = 3}
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+```
+
+
+```{r chemostat-npz-solution}
+npz <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+ 
+    p_growth     <- r_pgrow * N / (km_n + N) * P
+    
+    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_growth     <- c_asseff * z_grazing
+    n_recycling  <- (1 - c_asseff) * z_grazing
+
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+    
+    list(c(dN_dt, dP_dt, dZ_dt))
+   })
+}
+parms <- c(
+  r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz  = 0.4,   # zooplankton grazing parameter (1/d)
+  r_zloss  = 0.0,   # zooplankton loss parameter (1/d)
+  
+  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
+  c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
+
+  d       = 0.1,    # dilution rate (1/d)
+  N0      = 5       # P in inflow (mmol/m3)
+)
+
+times <- seq(0, 40, 0.1)        # (d)
+
+# Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)
+y  <- c(N=5, P=1, Z=10)
+
+parms["d"] <- 0.1
+out0 <- ode(y, times, npz, parms)
+plot(out0, mfrow = c(1, 3))
+```
+
+## Complete code
+
+```{r chemostat-npz-code}
+npz <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+ 
+    p_growth     <- r_pgrow * N / (km_n + N) * P
+    
+    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_growth     <- c_asseff * z_grazing
+    n_recycling  <- (1 - c_asseff) * z_grazing
+
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+    
+    list(c(dN_dt, dP_dt, dZ_dt))
+   })
+}
+parms <- c(
+  r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz  = 0.4,   # zooplankton grazing parameter (1/d)
+  r_zloss  = 0.0,   # zooplankton loss parameter (1/d)
+  
+  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
+  c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
+
+  d       = 0.1,    # dilution rate (1/d)
+  N0      = 5       # P in inflow (mmol/m3)
+)
+
+times <- seq(0, 40, 0.1)        # (d)
+
+# Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)
+y  <- c(N=5, P=1, Z=10)
+
+parms["d"] <- 0.1
+out0 <- ode(y, times, npz, parms)
+plot(out0, mfrow = c(1, 3))
+```
+
 
 ## Scenarios
 

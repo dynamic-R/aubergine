@@ -17,5 +17,4 @@ StripTrailingWhitespace: Yes
 
 BuildType: Package
 PackageUseDevtools: Yes
-PackagePath: aubergine
 PackageInstallArgs: --no-multiarch --with-keep.source
