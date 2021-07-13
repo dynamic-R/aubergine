@@ -35,7 +35,7 @@ dynamics of Nutrients and Phytoplankton:
 library (deSolve)
 chemostatNP <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
-    p_growth <- r_pgrow * N / (km_n + N) * P
+    p_growth <- r_pgrow * N / (k_n + N) * P
     
   # mass balance = process rates   + transport
     dN_dt   <-  - c_pn * p_growth + d*(N0-N)
@@ -43,7 +43,7 @@ chemostatNP <- function(time, y, parms) {
     list(c(dN_dt, dP_dt))
    })
 }
-parms<- c(r_pgrow=0.5, km_n=1.0, c_pn=1/106, d=0.1, N0=5)
+parms<- c(r_pgrow=0.5, k_n=1.0, c_pn=1/106, d=0.1, N0=5)
 y    <- c(N = 5, P = 1)  
 std  <- steady(y, times=c(0,Inf), func=chemostatNP, parms=parms,
                 method="runsteady") # solve model
@@ -61,7 +61,7 @@ riverNP <- function(time, y, parms) {
     N <- y[        1 :(1*nbox)]   
     P <- y[(1*nbox+1):(2*nbox)]   
 
-    p_growth  <- r_pgrow * N / (km_n + N) * P
+    p_growth  <- r_pgrow * N / (k_n + N) * P
 
    # transport: C.up=upstream conc, v=flow velocity             ## NEW ##
     n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)  
@@ -76,8 +76,8 @@ riverNP <- function(time, y, parms) {
 }
 parms <- c(
   r_pgrow = 0.5,   # phytoplankton growth parameter (1/d)
-  km_n    = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
-  km_p    = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
+  k_n     = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
+  k_p     = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
   c_pn    = 1/106, # conversion from phosporus to phyto (P:C)
   v       = 10000, # flow velocity (m/d)                        ## NEW ##
   N0      = 500,   # nutrient (PO4) in inflow (mmolP/m3)    
@@ -109,8 +109,8 @@ You now get the extended NPZ model in the chemostat:
 library (deSolve)
 chemostatNPZ <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
-    p_growth  <- r_pgrow * N / (km_n + N) * P
-    z_grazing <- r_zgraz * P / (km_p + P) * Z
+    p_growth  <- r_pgrow * N / (k_n + N) * P
+    z_grazing <- r_zgraz * P / (k_p + P) * Z
     z_loss    <- r_zloss * Z
   # mass balance = process rates   + transport
     dN_dt <- c_pn*(-p_growth + (1-asseff)*z_grazing + z_loss) +d*(N0-N)
@@ -119,8 +119,8 @@ chemostatNPZ <- function(time, y, parms) {
     list(c(dN_dt, dP_dt, dZ_dt))
    })
 }
-parms<- c(r_pgrow=0.5, r_zgraz=0.4, r_zloss=0.01, km_n=0.5, 
-          km_p=100, c_pn=1/106, asseff=0.3, d=0.11, N0=500)
+parms<- c(r_pgrow=0.5, r_zgraz=0.4, r_zloss=0.01, k_n=0.5, 
+          k_p=100, c_pn=1/106, asseff=0.3, d=0.11, N0=500)
 y   <- c(N=5, P=1, Z=1)  
 std <- steady(y, times=c(0,Inf), func=chemostatNPZ, parms=parms, method="runsteady") 
 ```
@@ -136,7 +136,7 @@ riverNPZ <- function(time, y, parms) {
     P <- y[(1*nbox+1):(2*nbox)]   
     Z <- ..                                                     ## CHANGE ##
     
-    p_growth  <- r_pgrow * N / (km_n + N) * P
+    p_growth  <- r_pgrow * N / (k_n + N) * P
     z_grazing <- ...                                            ## ADD ##
     z_loss    <- ...                                            ## ADD ##
 
@@ -158,8 +158,8 @@ parms <- c(
   r_zgraz  = 0.4,   # zooplankton ingestion parameter (1/d)
   r_zloss  = 0.01,  # zooplankton loss parameter (1/d)
 
-  km_n     = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
-  km_p     = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
+  k_n      = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
+  k_p      = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
   c_pn     = 1/106, # conversion from phosporus P to phyto C (P:C)
   asseff   = 0.3,   # assimilation efficiency of zoo (-)
 
@@ -195,8 +195,8 @@ riverNPZ <- function(time, y, parms) {
     P <- y[(  nbox+1):(2*nbox)]
     Z <- y[(2*nbox+1):(3*nbox)]                            ## ADDED ##
 
-    p_growth  <- r_pgrow * N / (km_n + N) * P
-    z_grazing <- r_zgraz * P / (km_p + P) * Z              ## ADDED ##
+    p_growth  <- r_pgrow * N / (k_n + N) * P
+    z_grazing <- r_zgraz * P / (k_p + P) * Z               ## ADDED ##
     z_loss    <- r_zloss * Z                               ## ADDED ##   
 
     n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)
@@ -215,8 +215,8 @@ parms <- c(
   r_zgraz  = 0.4,   # zooplankton ingestion parameter (1/d)
   r_zloss  = 0.01,  # zooplankton loss parameter (1/d)
 
-  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
-  km_p     = 100,   # Monod constant of zoo grazing on phyto (mmol/m3)
+  k_n      = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  k_p      = 100,   # Monod constant of zoo grazing on phyto (mmol/m3)
   c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C)
   asseff   = 0.3,   # assimilation efficiency of zoo (-)
 
@@ -274,5 +274,16 @@ legend("top", title="v=", legend=c("1km/d","5km/d","10km/d"),
        col=1:3, lty=1)
 ```
 
+## Outlook
 
+The 1D-NPZ model shows how straightforward transport can be implemented. We used 
+the "method of lines" where space is discretized in fixed steps while time is
+solved with standard solvers in variable time steps. This works for many problems,
+even in 2D and 3D, but there are of course also specialized cases where other
+methods are preferred.
+
+The model described here can be seen as a starting point for more complex 
+applications, e.g. with seasonal (or diurnal) forcing, variable river geometry,
+vertical exchange in the weater column of lakes or in the sediment and of course 
+also for completely different problems in other fields.
 

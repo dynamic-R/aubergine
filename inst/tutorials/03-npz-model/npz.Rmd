@@ -44,7 +44,7 @@ library("rootSolve")
 
 chemostat <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
-    p_growth <- r_pgrow * N / (km_n + N) * P
+    p_growth <- r_pgrow * N / (k_n + N) * P
 
     dN_dt   <- -c_pn * p_growth + d * (N0 - N)
     dP_dt   <-        p_growth - d * P
@@ -53,7 +53,7 @@ chemostat <- function(time, y, parms) {
 }
 parms <- c(
   r_pgrow = 0.5,   # phytoplankton growth parameter (1/d)
-  km_n    = 1.0,   # half saturation constant, P (mmol/m3)
+  k_n     = 1.0,   # half saturation constant, P (mmol/m3)
   c_pn    = 1/106, # stoichiometric conversion from phosphorus P to phyto C (P:C ratio)
   d       = 0.1,   # dilution rate (1/d)
   N0      = 5      # Phosphorus in inflow (mmol/m3)
@@ -79,18 +79,18 @@ the behaviour of this more complex model.
 Following the equations of $P$ and $N$ of the chemostat:
 
 \begin{align}
-\frac{dN}{dt} &= -r \cdot \frac{N}{km_n+N}\cdot P + d \cdot (N_0-N) \\
-\frac{dP}{dt} &=  r \cdot \frac{N}{km_n+N}\cdot P + d \cdot (0-P)
+\frac{dN}{dt} &= -r \cdot \frac{N}{k_n+N}\cdot P + d \cdot (N_0-N) \\
+\frac{dP}{dt} &=  r \cdot \frac{N}{k_n+N}\cdot P + d \cdot (0-P)
 \end{align}
 
 we can add a 3rd equation for zooplankton $Z$ as:
 
 \begin{align}
-\frac{dZ}{dt} &= c_{asseff} \cdot c_{pn} \cdot r_{zgraz} \cdot \frac{P}{km_P + P} - r_{zloss} \cdot Z - d \cdot Z
+\frac{dZ}{dt} &= c_{asseff} \cdot c_{pn} \cdot r_{zgraz} \cdot \frac{P}{k_P + P} - r_{zloss} \cdot Z - d \cdot Z
 \end{align}
 
 with $c_{asseff}$ = assimilation efficiency, $r_{zgraz}$ = zooplankton grazing 
-parameter, $r_{zloss}$ = zooplankton loss parameter, and $km_P$ = Monod constant 
+parameter, $r_{zloss}$ = zooplankton loss parameter, and $k_P$ = Monod constant 
 of zooplankton growth on phytoplankton. Units and parameter values are found in the
 code below.
 
@@ -99,8 +99,8 @@ Let's also assume, that nutrients from unused food $(1-c_{asseff})$ are recycled
 so we can write the full system:
 
 \begin{align}
-    p_{growth}    &= r_{pgrow} \cdot \frac{N}{km_n + N}  \cdot P\\
-    z_{grazing}   &= r_{zgraz}  \cdot \frac{P}{km_p + P} \cdot Z\\
+    p_{growth}    &= r_{pgrow} \cdot \frac{N}{k_n + N}  \cdot P\\
+    z_{grazing}   &= r_{zgraz}  \cdot \frac{P}{k_p + P} \cdot Z\\
     z_{growth}    &= c_{asseff} \cdot z_{grazing}\\
     n_{recycling} &= (1 - c_{asseff}) \cdot z_{grazing}\\
     \\
@@ -117,7 +117,7 @@ so we can write the full system:
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
-    p_growth     <- r_pgrow * N / (km_n + N) * P
+    p_growth     <- r_pgrow * N / (k_n + N) * P
     
     z_grazing    <- ...
     z_growth     <- ...
@@ -135,8 +135,8 @@ parms <- c(
   r_zgraz  = 0.4,   # zooplankton grazing parameter (1/d)
   r_zloss  = 0.0,   # zooplankton loss parameter (1/d)
   
-  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
-  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  k_n      = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  k_p      = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
   c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
   c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
 
@@ -159,8 +159,8 @@ list(c(dN_dt, dP_dt, dZ_dt))
 ```
 
 ```{r chemostat-npz-hint-2, exercise.lines = 4}
-    p_growth     <- r_pgrow * N / (km_n + N) * P
-    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    p_growth     <- r_pgrow * N / (k_n + N) * P
+    z_grazing    <- r_zgraz  * P / (k_p + P) * Z
     z_growth     <- c_asseff * z_grazing
     n_recycling  <- (1 - c_asseff) * z_grazing
 ```
@@ -176,9 +176,9 @@ list(c(dN_dt, dP_dt, dZ_dt))
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
-    p_growth     <- r_pgrow * N / (km_n + N) * P
+    p_growth     <- r_pgrow * N / (k_n + N) * P
     
-    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_grazing    <- r_zgraz  * P / (k_p + P) * Z
     z_growth     <- c_asseff * z_grazing
     n_recycling  <- (1 - c_asseff) * z_grazing
 
@@ -194,8 +194,8 @@ parms <- c(
   r_zgraz  = 0.4,   # zooplankton grazing parameter (1/d)
   r_zloss  = 0.0,   # zooplankton loss parameter (1/d)
   
-  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
-  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  k_n      = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  k_p      = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
   c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
   c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
 
@@ -219,9 +219,9 @@ plot(out0, mfrow = c(1, 3))
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
-    p_growth     <- r_pgrow * N / (km_n + N) * P
+    p_growth     <- r_pgrow * N / (k_n + N) * P
     
-    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_grazing    <- r_zgraz  * P / (k_p + P) * Z
     z_growth     <- c_asseff * z_grazing
     n_recycling  <- (1 - c_asseff) * z_grazing
 
@@ -237,8 +237,8 @@ parms <- c(
   r_zgraz  = 0.4,   # zooplankton grazing parameter (1/d)
   r_zloss  = 0.0,   # zooplankton loss parameter (1/d)
   
-  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
-  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  k_n      = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  k_p      = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
   c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
   c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
 
@@ -340,7 +340,16 @@ legend("topright",
   lty=1, col=1:6, cex=0.5)
 ```
 
-## References
+## Outlook
+
+The example shows that even such a simple model can show surprisingly complex
+behaviour. It can therefore serve as a starting point in different directions,
+practically by extending the model and making it more realistic, and theoretically
+by analysing its behavior more systematically by, for example, stability and 
+bifurcation analysis.
+
+
+### References
 
 <div id="refs"></div>
 
