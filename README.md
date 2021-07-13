@@ -9,8 +9,8 @@ The package is created with the **learnr** package.
 ## Installation
 
 ```
-devtools::install_package(‘dynamic-R/aubergine’, depend=TRUE)
+devtools::install_github(‘dynamic-R/aubergine’, depend=TRUE)
 ```
 
 ---
-2021-07-12
+2021-07-13
