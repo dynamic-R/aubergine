@@ -1,6 +1,6 @@
 # aubergine
 
-<img src="logo.jpg" width="100">
+<img src="man/figures/logo.jpg" width="100">
 
 A package with teaching material for dynamic simulations in **R**.
 

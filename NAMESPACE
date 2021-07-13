@@ -1,5 +1,5 @@
 import(learnr)
-import(ReacTran, deSolve, rootSolve)
+import(ReacTran, deSolve, rootSolve, future)
 importFrom("utils", "browseURL")
 
 export(AUBtutorial)

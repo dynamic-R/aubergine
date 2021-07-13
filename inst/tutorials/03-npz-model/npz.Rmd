@@ -18,17 +18,25 @@ library(learnr)
 
 ## Introduction
 
-The example shows how a chemostat model [cf. @Novick1950;@Herbert1956] with heterotrophic or autotrophic organisms (bacteria, algae, $P$), can be extended to a simple NPZ model with nutrients, phytoplankton and zooplankton.
+The example shows how a chemostat model [cf. @Novick1950;@Herbert1956]
+with heterotrophic or autotrophic organisms (bacteria, algae, $P$),
+can be extended to a simple NPZ model with nutrients, phytoplankton
+and zooplankton.
 
-It builds on the chemostat model with two equations from the previous tutorial.
+It builds on the chemostat model with two equations from the previous
+tutorial.
 
-Please don't get confused! Here **P** is phytoplankton and not phosphorus, while
-the symbol for the nutrient **N** does not necessarily mean that it is nitrogen.
+Please don't get confused! Here **P** is phytoplankton and not
+phosphorus, while the symbol for the nutrient **N** does not
+necessarily mean that it is nitrogen.
 
 ## Implementation of the chemostat
 
-The chemostat model is repeated here.  
-The model is written in the **R** programming language for statistical computing [@RCore2018], and solved numerically with solvers from package **deSolve** [@Soetaert2010a]; equilibria are estimated with package **rootSolve** [@Soetaert2009]. See  @Soetaert2010a or @Soetaert2010c for details. 
+The chemostat model is repeated here.  The model is written in the
+**R** programming language for statistical computing [@RCore2018], and
+solved numerically with solvers from package **deSolve**
+[@Soetaert2010a]; equilibria are estimated with package **rootSolve**
+[@Soetaert2009]. See @Soetaert2010a or @Soetaert2010c for details.
 
 ```{r, chemostat}
 library("deSolve")
@@ -37,12 +45,9 @@ library("rootSolve")
 chemostat <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
     p_growth <- r_pgrow * N / (km_n + N) * P
-    n_import <- d * N0
-    n_export <- d * N
-    p_export <- d * P
-    
-    dN_dt   <- n_import - c_pn * p_growth - n_export
-    dP_dt   <-                   p_growth - p_export
+
+    dN_dt   <- -c_pn * p_growth + d * (N0 - N)
+    dP_dt   <-        p_growth - d * P
     list(c(dN_dt, dP_dt), p_growth = p_growth)
    })
 }
@@ -62,34 +67,67 @@ plot(out, mfrow=c(1, 3))
 
 ## NPZ extension of the chemostat model
 
-The chemostat equations can serve as a starting point for further extensions, e.g. the production of specific substances in bioreactors, or additional trophic levels. The equations are fundamental for the description of other flow-through systems, up to waste water treatment plants, or lakes. 
+The chemostat equations can serve as a starting point for further
+extensions, e.g. the production of specific substances in bioreactors,
+or additional trophic levels. The equations are fundamental for the
+description of other flow-through systems, up to waste water treatment
+plants, or lakes.
 
-Here we implement zooplankton as a third state variable and then test the behaviour of this more complex model.
+Here we implement zooplankton as a third state variable and then test
+the behaviour of this more complex model.
+
+Following the equations of $P$ and $N$ of the chemostat:
+
+\begin{align}
+\frac{dN}{dt} &= -r \cdot \frac{N}{km_n+N}\cdot P + d \cdot (N_0-N) \\
+\frac{dP}{dt} &=  r \cdot \frac{N}{km_n+N}\cdot P + d \cdot (0-P)
+\end{align}
+
+we can add a 3rd equation for zooplankton $Z$ as:
+
+\begin{align}
+\frac{dZ}{dt} &= c_{asseff} \cdot c_{pn} \cdot r_{zgraz} \cdot \frac{P}{km_P + P} - r_{zloss} \cdot Z - d \cdot Z
+\end{align}
+
+with $c_{asseff}$ = assimilation efficiency, $r_{zgraz}$ = zooplankton grazing 
+parameter, $r_{zloss}$ = zooplankton loss parameter, and $km_P$ = Monod constant 
+of zooplankton growth on phytoplankton. Units and parameter values are found in the
+code below.
 
 
-## The NPZ model
+Let's also assume, that nutrients from unused food $(1-c_{asseff})$ are recycled, 
+so we can write the full system:
+
+\begin{align}
+    p_{growth}    &= r_{pgrow} \cdot \frac{N}{km_n + N}  \cdot P\\
+    z_{grazing}   &= r_{zgraz}  \cdot \frac{P}{km_p + P} \cdot Z\\
+    z_{growth}    &= c_{asseff} \cdot z_{grazing}\\
+    n_{recycling} &= (1 - c_{asseff}) \cdot z_{grazing}\\
+    \\
+    \text{and the state equations:}\\
+    \frac{dN}{dt}   &= c_{pn} \cdot (-p_{growth} + n_{recycling}) + d \cdot (N_0 - N)\\
+    \frac{dP}{dt}   &= p_{growth} - z_{grazing}             - d \cdot P\\
+    \frac{dZ}{dt}   &= z_{growth} - r_{zloss}  \cdot Z      - d \cdot Z
+\end{align}
 
 
-```{r chemostat-npz}
+### Implementation of the NPZ model
+
+```{r chemostat-npz, exercise=TRUE, exercise.lines = 25}
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
-    p_growth <- r_pgrow * N / (km_n + N) * P
+    p_growth     <- r_pgrow * N / (km_n + N) * P
     
-    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
-    z_growth     <- asseff * z_grazing
-    n_recycling  <- (1 - asseff) * c_pn * z_grazing
+    z_grazing    <- ...
+    z_growth     <- ...
+    n_recycling  <- ...
 
-    n_import <- d * N0
-    n_export <- d * N
-    p_export <- d * P
-    z_export <- d * Z    
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- ...
     
-    dN_dt   <- n_import - c_pn * p_growth - n_export + n_recycling
-    dP_dt   <- p_growth - z_grazing - p_export
-    dZ_dt   <- z_growth - z_export
-    
-    list(c(dN_dt, dP_dt, dZ_dt))
+    list(c(dN_dt, dP_dt, ...))
    })
 }
 parms <- c(
@@ -100,7 +138,7 @@ parms <- c(
   km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
   km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
   c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
-  asseff   = 0.3,   # zooplankton assimilation efficiency (-)
+  c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
 
   d       = 0.1,    # dilution rate (1/d)
   N0      = 5       # P in inflow (mmol/m3)
@@ -116,7 +154,117 @@ out0 <- ode(y, times, npz, parms)
 plot(out0, mfrow = c(1, 3))
 ```
 
-## Scenarios
+```{r chemostat-npz-hint-1, exercise.lines = 1}
+list(c(dN_dt, dP_dt, dZ_dt))
+```
+
+```{r chemostat-npz-hint-2, exercise.lines = 4}
+    p_growth     <- r_pgrow * N / (km_n + N) * P
+    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_growth     <- c_asseff * z_grazing
+    n_recycling  <- (1 - c_asseff) * z_grazing
+```
+
+```{r chemostat-npz-hint-3,  exercise.lines = 3}
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+```
+
+
+```{r chemostat-npz-solution}
+npz <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+ 
+    p_growth     <- r_pgrow * N / (km_n + N) * P
+    
+    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_growth     <- c_asseff * z_grazing
+    n_recycling  <- (1 - c_asseff) * z_grazing
+
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+    
+    list(c(dN_dt, dP_dt, dZ_dt))
+   })
+}
+parms <- c(
+  r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz  = 0.4,   # zooplankton grazing parameter (1/d)
+  r_zloss  = 0.0,   # zooplankton loss parameter (1/d)
+  
+  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
+  c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
+
+  d       = 0.1,    # dilution rate (1/d)
+  N0      = 5       # P in inflow (mmol/m3)
+)
+
+times <- seq(0, 40, 0.1)        # (d)
+
+# Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)
+y  <- c(N=5, P=1, Z=10)
+
+parms["d"] <- 0.1
+out0 <- ode(y, times, npz, parms)
+plot(out0, mfrow = c(1, 3))
+```
+
+## Complete code
+
+```{r chemostat-npz-code}
+npz <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+ 
+    p_growth     <- r_pgrow * N / (km_n + N) * P
+    
+    z_grazing    <- r_zgraz  * P / (km_p + P) * Z
+    z_growth     <- c_asseff * z_grazing
+    n_recycling  <- (1 - c_asseff) * z_grazing
+
+    dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
+    dP_dt   <- p_growth - z_grazing             - d * P
+    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+    
+    list(c(dN_dt, dP_dt, dZ_dt))
+   })
+}
+parms <- c(
+  r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz  = 0.4,   # zooplankton grazing parameter (1/d)
+  r_zloss  = 0.0,   # zooplankton loss parameter (1/d)
+  
+  km_n     = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  km_p     = 100,   # Monod constant of zoo growth on phyto (mmol/m3)
+  c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C ratio)
+  c_asseff = 0.3,   # zooplankton assimilation efficiency (-)
+
+  d       = 0.1,    # dilution rate (1/d)
+  N0      = 5       # P in inflow (mmol/m3)
+)
+
+times <- seq(0, 40, 0.1)        # (d)
+
+# Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)
+y  <- c(N=5, P=1, Z=10)
+
+parms["d"] <- 0.1
+out0 <- ode(y, times, npz, parms)
+plot(out0, mfrow = c(1, 3))
+```
+
+
+## Dynamic behavior
+
+The model above is able to show various dynamic behavior, e.g. different 
+equilibria and Lotka-Volterra cycles, depending on the parameter values.
+
+### Exercise
+
+Adapt the model parameters and try to reproduce the following dynamic patterns:
 
 
 * scenario 0: equilibrium, algae extinct
@@ -126,6 +274,18 @@ plot(out0, mfrow = c(1, 3))
 * scenario 4: equilibrium, both extinct
 * scenario 5: damped oscillation
 
+Start to change the parameter $d$ only and if time allows play also with other parameters.
+
+```{r npz-scenario-exercise, exercise = TRUE, exercise.lines = 20, fig.height=3, fig.width=8}
+<<chemostat-npz-code>>
+times <- seq(0, 1000)
+parms["d"] <- 0.0
+out <- ode(y, times, npz, parms)
+plot(out, mfrow = c(1, 3))
+```
+
+
+## Dynamic bevavior: Solutions
 
 ```{r npz-scenario0, fig.height=3, fig.width=8}
 times <- seq(0, 1000)
@@ -170,7 +330,14 @@ plot(out5, mfrow=c(1, 3))
 
 ```{r npz-all, fig.height=3, fig.width=8}
 plot(out0, out1, out2, out3, out4, out5, mfrow=c(1,3), lty=1)
-legend("topright", legend=c("EQ, No Algae", "Lotka-Volterra", "EQ, No Zoo", "EQ, coexistence", "EQ. both extinct", "Damped oscillation"), lty=1, col=1:6, cex=0.5)
+legend("topright",
+  legend=c("EQ, No Algae",
+           "Lotka-Volterra",
+	         "EQ, No Zoo", 
+           "EQ, coexistence", 
+           "EQ. both extinct", 
+           "Damped oscillation"), 
+  lty=1, col=1:6, cex=0.5)
 ```
 
 ## References
