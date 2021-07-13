@@ -257,7 +257,14 @@ plot(out0, mfrow = c(1, 3))
 ```
 
 
-## Scenarios
+## Dynamic behavior
+
+The model above is able to show various dynamic behavior, e.g. different 
+equilibria and Lotka-Volterra cycles, depending on the parameter values.
+
+### Exercise
+
+Adapt the model parameters and try to reproduce the following dynamic patterns:
 
 
 * scenario 0: equilibrium, algae extinct
@@ -267,6 +274,18 @@ plot(out0, mfrow = c(1, 3))
 * scenario 4: equilibrium, both extinct
 * scenario 5: damped oscillation
 
+Start to change the parameter $d$ only and if time allows play also with other parameters.
+
+```{r npz-scenario-exercise, exercise = TRUE, exercise.lines = 20, fig.height=3, fig.width=8}
+<<chemostat-npz-code>>
+times <- seq(0, 1000)
+parms["d"] <- 0.0
+out <- ode(y, times, npz, parms)
+plot(out, mfrow = c(1, 3))
+```
+
+
+## Dynamic bevavior: Solutions
 
 ```{r npz-scenario0, fig.height=3, fig.width=8}
 times <- seq(0, 1000)
