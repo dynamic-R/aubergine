@@ -8,15 +8,6 @@ output:
     toc: no 
 ---
 
-
-```{echo = FALSE, include = FALSE}
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Anoxia in a River: modeling exercise}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
-```
-
 # Problem formulation
 
 One of the major pollution problems in European rivers and estuaries is the input of untreated municipal waste water. A major chemical component of such wastewater is ammonia ($NH_3$). Here we will make a case study of the Scheldt estuary, in the Southwestern part of the Netherlands. This estuary receives its water from the Scheldt river. 

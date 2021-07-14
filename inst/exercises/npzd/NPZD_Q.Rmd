@@ -8,14 +8,6 @@ output:
     default
 ---
 
-```{echo = FALSE, include = FALSE}
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Nutrients, Phytoplankton, Zooplankton, Detritus: modeling exercise}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
-```
-
 # Problem formulation
 
 The NPZD model is a monument in biological oceanography and limnology. It provides a simplified description for nutrient cycling in the water column in which only four state variables are described: Nutrients (*N*), Phytoplankton (*P*), Zooplankton (*Z*) and Detritus (*D*).
