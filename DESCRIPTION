@@ -1,6 +1,6 @@
 Package: aubergine
 Type: Package
-Title: Tutorials and exercises for a 1-Day workshop
+Title: Tutorials and Exercises for a 1-Day Workshop
 Version: 0.1.1
 Author: Karline Soetaert and Thomas Petzoldt
 Maintainer: Karline Soetaert <Karline.Soetaert@nioz.nl>
@@ -10,4 +10,4 @@ Description: Tutorials for use in a 1-D modelling workshop organized by AEMON-J.
 License: GPL (>=3.0)
 VignetteBuilder: knitr
 Encoding: UTF-8
-
+RoxygenNote: 7.1.1

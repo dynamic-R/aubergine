@@ -1,5 +1,5 @@
 ---
-title: "Modelling in R: A Chemostat with Phyto- and Zooplankton"
+title: "Modelling in R: From a Chemostat to NPZ with Phyto- and Zooplankton"
 author: "Thomas Petzoldt and Karline Soetaert"
 description: "Tutorial: extend a chemostat model towards an NPZ model with nutrient, phytoplankton and zooplankton"
 date: "July-2021"
@@ -47,7 +47,7 @@ chemostat <- function(time, y, parms) {
     p_growth <- r_pgrow * N / (k_n + N) * P
 
     dN_dt   <- -c_pn * p_growth + d * (N0 - N)
-    dP_dt   <-        p_growth - d * P
+    dP_dt   <-         p_growth + d * (0 - P)
     list(c(dN_dt, dP_dt), p_growth = p_growth)
    })
 }
@@ -74,7 +74,7 @@ description of other flow-through systems, up to waste water treatment
 plants, or lakes.
 
 Here we implement zooplankton as a third state variable and then test
-the behaviour of this more complex model.
+the behavior of this more complex model.
 
 Following the equations of $P$ and $N$ of the chemostat:
 
@@ -124,7 +124,7 @@ npz <- function(time, y, parms) {
     n_recycling  <- ...
 
     dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
-    dP_dt   <- p_growth - z_grazing             - d * P
+    dP_dt   <- p_growth - z_grazing             + d * (0 - P)
     dZ_dt   <- ...
     
     list(c(dN_dt, dP_dt, ...))
@@ -167,8 +167,8 @@ list(c(dN_dt, dP_dt, dZ_dt))
 
 ```{r chemostat-npz-hint-3,  exercise.lines = 3}
     dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
-    dP_dt   <- p_growth - z_grazing             - d * P
-    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+    dP_dt   <- p_growth - z_grazing             + d * (0 - P)
+    dZ_dt   <- z_growth - r_zloss * Z           + d * (0 - Z)
 ```
 
 
@@ -183,8 +183,8 @@ npz <- function(time, y, parms) {
     n_recycling  <- (1 - c_asseff) * z_grazing
 
     dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
-    dP_dt   <- p_growth - z_grazing             - d * P
-    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+    dP_dt   <- p_growth - z_grazing             + d * (0 - P)
+    dZ_dt   <- z_growth - r_zloss * Z           + d * (0 - Z)
     
     list(c(dN_dt, dP_dt, dZ_dt))
    })
@@ -226,8 +226,8 @@ npz <- function(time, y, parms) {
     n_recycling  <- (1 - c_asseff) * z_grazing
 
     dN_dt   <- c_pn * (-p_growth + n_recycling) + d * (N0 - N)
-    dP_dt   <- p_growth - z_grazing             - d * P
-    dZ_dt   <- z_growth - r_zloss * Z           - d * Z
+    dP_dt   <- p_growth - z_grazing             + d * (0 - P)
+    dZ_dt   <- z_growth - r_zloss * Z           + d * (0 - Z)
     
     list(c(dN_dt, dP_dt, dZ_dt))
    })
@@ -343,7 +343,7 @@ legend("topright",
 ## Outlook
 
 The example shows that even such a simple model can show surprisingly complex
-behaviour. It can therefore serve as a starting point in different directions,
+behavior. It can therefore serve as a starting point in different directions,
 practically by extending the model and making it more realistic, and theoretically
 by analysing its behavior more systematically by, for example, stability and 
 bifurcation analysis.

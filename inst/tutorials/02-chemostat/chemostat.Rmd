@@ -31,12 +31,12 @@ library(rootSolve)
 
 The example shows a chemostat model [cf. @Novick1950;@Herbert1956] by
 example of heterotrophic or autotrophic organisms (bacteria, algae,
-$P$), where growth is limited by a single nutrient (e.g. phosphorus,
-$N$) via a Monod equation.
+**P**), where growth is limited by a single nutrient (e.g. phosphorus,
+**N**) via a Monod equation.
 
 We use here a notation, compatible with the so-called NPZ and NPZD
-models where $N$ is a nutrient (nitrogen or phosphorus), $P$ is
-phytoplankton, $Z$ zooplankton and (optionally) $D$ is
+models where **N** is a nutrient (nitrogen or phosphorus), **P** is
+phytoplankton, **Z** zooplankton and (optionally) **D** is
 detritus. Please don't get confused! Here **P** is phytoplankton and
 not phosphorus, while the symbol for the nutrient **N** does not
 necessarily mean that it is nitrogen.
@@ -73,8 +73,8 @@ chemostat <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
     p_growth <- r_pgrow * N / (k_n + N) * P
 
-    dN_dt   <- - c_pn * p_growth - d * (N0 - N)
-    dP_dt   <-          p_growth - d * (0 - P)
+    dN_dt   <- - c_pn * p_growth + d * (N0 - N)
+    dP_dt   <-          p_growth + d * (0 - P)
     list(c(dN_dt, dP_dt), p_growth = p_growth)
    })
 }
