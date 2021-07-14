@@ -113,7 +113,8 @@ so we can write the full system:
 
 ### Implementation of the NPZ model
 
-```{r chemostat-npz, exercise=TRUE, exercise.lines = 25}
+```{r chemostat-npz, exercise=TRUE, exercise.eval=FALSE, exercise.lines = 25}
+library("deSolve")
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
@@ -173,6 +174,7 @@ list(c(dN_dt, dP_dt, dZ_dt))
 
 
 ```{r chemostat-npz-solution}
+library("deSolve")
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
