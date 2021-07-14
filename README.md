@@ -9,22 +9,22 @@ The package is created with the **learnr** package.
 ## Installation
 
 ```
-devtools::install_github(‘dynamic-R/aubergine’, depend=TRUE)
+devtools::install_github("dynamic-R/aubergine", depend=TRUE)
 ```
 
-## Installation on older versions of R**
+## Installation on older versions of R
 
 **R** is sometimes strict if a package is to be installed from Github 
 and some packages have a newer version, e.g. installation of **learnr** 
 built on **R** 4.0.5  on an older **R** version, e.g. 4.0.4.
 
 If installation fails under such circumstances, use the following 
-workaround, so that the (in this case unproblematic) warnings  
+workaround, so that the (in this case unproblematic) warnings 
 will not throw an error:
 
 ```
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
-devtools::install_github(‘dynamic-R/aubergine’, depend=TRUE)
+devtools::install_github("dynamic-R/aubergine", depend=TRUE)
 ```
 
 ## Uninstall
