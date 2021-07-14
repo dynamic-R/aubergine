@@ -280,7 +280,7 @@ Adapt the model parameters and try to reproduce the following dynamic patterns:
 Start to change the parameter $d$ only and if time allows play also with other parameters.
 
 ```{r npz-scenario-exercise, exercise = TRUE, exercise.lines = 20, exercise.setup="chemostat-npz-code", fig.height=3, fig.width=8}
-times <- seq(0, 1000)
+times <- seq(0, 800)
 parms["d"] <- 0.0
 out <- ode(y, times, npz, parms)
 plot(out, mfrow = c(1, 3))
