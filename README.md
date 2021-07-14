@@ -14,7 +14,7 @@ devtools::install_github("dynamic-R/aubergine", depend=TRUE)
 
 ### Installation on older versions of R
 
-**R** installation from Github is sometimes strict, if installation is done on an older version, but some packages were created on a newer version, e.g. installation of **learnr** 
+Package installation from Github is sometimes strict, if installation is done on an older **R** version, but some packages were created with a newer version, e.g. installation of **learnr** 
 built on **R** 4.0.5  on an older **R** version, e.g. 4.0.4.
 
 If installation fails under such circumstances, use the following 
@@ -28,8 +28,8 @@ devtools::install_github("dynamic-R/aubergine", depend=TRUE)
 
 ## Start of a Tutorial
 
-Close and Restart RStudio (!) an the tutrial will show up
-in the "Tutorial" tab. Select a tutorial and start
+Close and **restart** RStudio (!) and the tutorial will show up
+in the "Tutorial" tab. Select a tutorial and start ...
 
 ![](man/figures/tutorial_tab.png)
 
