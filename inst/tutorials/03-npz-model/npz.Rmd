@@ -218,6 +218,7 @@ plot(out0, mfrow = c(1, 3))
 ## Complete code
 
 ```{r chemostat-npz-code}
+library("deSolve")
 npz <- function(time, y, parms) {
   with(as.list(c(y, parms)), {
  
@@ -278,7 +279,7 @@ Adapt the model parameters and try to reproduce the following dynamic patterns:
 
 Start to change the parameter $d$ only and if time allows play also with other parameters.
 
-```{r npz-scenario-exercise, exercise = TRUE, exercise.lines = 20, exercise.setup="chemostat-npz-code", ig.height=3, fig.width=8}
+```{r npz-scenario-exercise, exercise = TRUE, exercise.lines = 20, exercise.setup="chemostat-npz-code", fig.height=3, fig.width=8}
 times <- seq(0, 1000)
 parms["d"] <- 0.0
 out <- ode(y, times, npz, parms)
@@ -288,14 +289,14 @@ plot(out, mfrow = c(1, 3))
 
 ## Dynamic bevavior: Solutions
 
-```{r npz-scenario0, fig.height=3, fig.width=8}
+```{r npz-scenario0, fig.height=3, fig.width=8, exercise.setup="chemostat-npz-code"}
 times <- seq(0, 1000)
 parms["d"] <- 0.0
 out0 <- ode(y, times, npz, parms)
 plot(out0, mfrow = c(1, 3))
 ```
 
-```{r npz-scenario1, fig.height=3, fig.width=8}
+```{r npz-scenario1, fig.height=3, fig.width=8, exercise.setup="chemostat-npz-code"}
 parms["d"] <- 0.2
 out1 <- ode(y, times, npz, parms)
 plot(out1, mfrow=c(1, 3))
