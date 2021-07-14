@@ -15,6 +15,5 @@ Organized by AEMON-J
 \examples{
 # To have a list of all available tutorials:
 AUBtutorial("?")
-AUBexercise("?")
 }
 

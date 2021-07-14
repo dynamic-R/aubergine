@@ -3,4 +3,4 @@ import(ReacTran, deSolve, rootSolve, future)
 importFrom("utils", "browseURL")
 
 export(AUBtutorial)
-export(AUBexercise)
+# export(AUBexercise)

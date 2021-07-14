@@ -5,8 +5,7 @@ AUBtutorial <- function(x = c(
     "02-chemostat",
     "03-npz-model",
     "04-npz-in-a-river",
-    "xx01-npzd-model in a batch",
-    "xx02-bacterial-kinetics")) {
+    "05-npzd-model in a batch")) {
 
   LL <- as.character(formals(AUBtutorial)$x[-1])
 
@@ -16,8 +15,7 @@ AUBtutorial <- function(x = c(
        "A chemostat model with nutrient limitation",
        "Extending the Chemostat to an NPZ",
        "Partial differential equation model in 1D",
-       "NPZD model",
-       "A model of bacterial kinetics"))
+       "NPZD model with seasonal forcing"))
     return(tutorial)
   } else {
    if (is.character(x))
