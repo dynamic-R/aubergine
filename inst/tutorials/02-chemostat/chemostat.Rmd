@@ -211,12 +211,12 @@ P <- Y * (N0 - N)
 par(mfrow=c(1, 3))
 plot(d, N,     type="l")
 plot(d, P,     type="l")
-plot(d, N * P, type="l")
+plot(d, d * P, type="l")
 ```
 
 Here we see that with increasing $d$ the equilibrium phytoplankton
 concentration decreases and more nutrients are left over. The
-production, however (N*P) approaches an optimum at high dilution
+production, however (d*P) approaches an optimum at high dilution
 rates. If the dilution exceeds maximum growth, the chemostat dies out.
 
 ## Steady state solved numerically
@@ -270,7 +270,7 @@ for (i in 1:nrow(state)) {
 par(mfrow = c(1, 3))
 plot(N     ~ d, data = state, type = "l")
 plot(P     ~ d, data = state, type = "l")
-plot(N * P ~ d, data = state, type = "l")
+plot(d * P ~ d, data = state, type = "l")
 ``` 
 
 We use a `for`-loop here for simplicity, even if list-based approaches
