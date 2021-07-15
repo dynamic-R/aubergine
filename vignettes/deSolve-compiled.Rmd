@@ -1,20 +1,21 @@
 ---
 title: 'deSolve: Use of Compiled Code'
-author: "Karline Soetaert and Thomas Petzoldt"
+author: "Thomas Petzoldt and Karline Soetaert"
 date: "`r Sys.Date()`"
 bibliography: desolve.bib
-output:
-  html_document:
+output: 
+  rmarkdown::html_vignette:
     toc: true
-    toc_float:
-      collapsed: false
-      smooth_scroll: true
-    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{deSolve: Use of Compiled Code}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8} 
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width=9, fig.height=6, out.width=600, out.height=400, fig.align="center")
 library("deSolve")
+library("scatterplot3d")
 ```
 
 
@@ -33,9 +34,9 @@ Fortunately, there is a way to unlock the handbreake. Both **R** in general and 
 
 ## The Lorenz system in pure R
 
-```{r}
-library(deSolve)
-library(scatterplot3d)
+```{r lorenz, fig.width=9, fig.height=6, out.width=600, out.height=400, fig.align="center"}
+library("deSolve")
+library("scatterplot3d")
 
 Lorenz <- function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
@@ -222,12 +223,7 @@ dyn.unload("lorenzf.dll")
 More can be found in the package vignette [compiledCode](https://CRAN.R-project.org/package=deSolve/vignettes/compiledCode.pdf) or in the paper of @Soetaert2010a. In addition to this, compiled differential equation models are also supported by other packages like **cOde** and **dMod** [@Kaschek2018;@Kaschek2018b] or **rodeo**  [@Kneis2017;@rodeo2018].
 
 
-
 ## References
 
 <div id="refs"></div>
-
-----
-
-**Copyright and original author:** [tpetzoldt](https://github.com/tpetzoldt), `r Sys.Date()`
 

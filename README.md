@@ -9,6 +9,7 @@ The package is created with the **learnr** package.
 ## Installation
 
 ```
+install.packages("devtools") # if it is not yet installed
 devtools::install_github("dynamic-R/aubergine", depend=TRUE)
 ```
 
@@ -22,6 +23,7 @@ workaround, so that the (in this case unproblematic) warnings
 will not throw an error:
 
 ```
+install.packages("devtools") # if it is not yet installed
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 devtools::install_github("dynamic-R/aubergine", depend=TRUE)
 ```
