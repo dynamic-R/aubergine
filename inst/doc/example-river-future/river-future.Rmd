@@ -1,0 +1,222 @@
+---
+title: "Parallelisation with 'future' and Animations"
+author: "Thomas Petzoldt and Karline Soetaert"
+date: "July 2021"
+output: html_document
+bibliography: bib.bib
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("ReacTran")
+library("future")
+library("gifski")
+```
+
+
+**Technical Note** regarding compilation of this document:
+
+* Please run this in a folder with write access, the document will create several 100 files.
+* Due to simulations, compilation may take a minute or more.
+* At the end, you can easily delete all temporary river*.png files.
+
+## A Goody at the End: Easy Parallel Execution with `future`
+
+We have seen that computation of 1D models can take a while, and if we go through the script line by
+line, we may consider to wait before we enter the next part. Here we can ask: Why not running the simulation in the background or Why not running the three scenarios in parallel on our multiprocessor machine? 
+
+This is indeed possible and R has different mechanisms for this, one intriguingly 
+simple is provided by package **future** [@Bengtsson2020]. In the following, we 
+just use the `%<-%` operator instead of the common `<-`.
+
+Before that, we set a `plan` that **R** should run this in multiple sessions.
+
+How does it work? After entering sich a code segment, R gives control back to the user,
+and starts simulation in a separate R worker process in the background.
+This can then be done for all three scenarios one after each other, because its results (`std0` ... `std2`) are not yet needed for the next step. They are eventually needed "in the future" for the `plot` function, so R does not need to return the results immediately.
+
+The following code is again a simple 1D river model, solved with packages **deSolve** [@Soetaert2010a] and **ReacTran** [@Soetaert2012ReacTran].
+
+### The model
+
+```{r river-npz}
+library(ReacTran)
+
+riverNPZ <- function(time, y, parms) {
+  with(as.list(parms), {
+    N <- y[       1  :   nbox ]
+    P <- y[(  nbox+1):(2*nbox)]
+    Z <- y[(2*nbox+1):(3*nbox)]
+
+    p_growth  <- r_pgrow * N / (km_n + N) * P
+    z_grazing <- r_zgraz * P / (km_p + P) * Z
+    z_loss    <- r_zloss * Z
+
+    n_transport <- tran.1D(C=N, C.up=N.up, v=v, dx=Grid)
+    p_transport <- tran.1D(C=P, C.up=P.up, v=v, dx=Grid)
+    z_transport <- tran.1D(C=Z, C.up=Z.up, v=v, dx=Grid)
+
+    n_import <- n_transport$flux.up   # in [mmol/m2/d]
+    n_export <- n_transport$flux.down
+
+    dN_dt <- c_pn * (-p_growth + (1-asseff) * z_grazing + z_loss) + n_transport$dC
+    dP_dt <-         p_growth -               z_grazing           + p_transport$dC
+    dZ_dt <-                  +     asseff *  z_grazing - z_loss  + z_transport$dC
+
+    list(c(dN_dt, dP_dt, dZ_dt),
+         n_import=n_import, n_export=n_export,
+         meanN=mean(N), meanP=mean(P), meanZ=mean(Z))
+  })
+}
+parms <- c(
+  r_pgrow    = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz    = 0.4,   # zooplankton ingestion parameter (1/d)
+  r_zloss    = 0.01,  # zooplankton loss parameter (1/d)
+
+  km_n       = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  km_p       = 100,   # Monod constant of zoo grazing on phyto (mmol/m3)
+  c_pn       = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C)
+  asseff     = 0.3,   # assimilation efficiency of zoo (-)
+
+  v          = 10000, # flow velocity (m/d)
+  N.up       = 500,   # nutrient (PO4) in inflow (mmolP/m3)
+  P.up       = 10,    # algae in inflow (mmolC/m3)
+  Z.up       = 1      # zooplankton in inflow (mmolC/m3)
+)
+
+# river morphology
+Length <- 500e3  # length of the river (m)
+nbox   <- 500    # number of 1D grid cells
+Grid   <- setup.grid.1D(L = Length, N = nbox)
+
+# Zoo and Phyto as C and Phosphorus P (mol/m3)
+N_init  <- rep(500, times=nbox) # mmolP/m3
+P_init  <- rep(100, times=nbox) # mmolC/m3
+Z_init  <- rep(10,  times=nbox) # mmolC/m3
+y_init  <- c(N_init, P_init, Z_init)
+```
+
+### Parallelization
+
+```{r river-npz-future, fig.height=8, fig.width=8}
+library("future")
+
+parms1 <- parms2 <- parms
+system.time({
+  plan(strategy="multisession")
+  #plan(strategy="sequential")
+  
+  ## three staions for the equilibrium (=stationary state)
+  parms["v"] <- 1000  # (m/d)
+  std0 %<-% steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
+                       nspec=3, names=c("N","P","Z"), method="runsteady")
+  
+  parms1["v"] <- 5000  # m/d
+  std1 %<-% steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms1,
+                       nspec=3, names=c("N","P","Z"), method="runsteady")
+  
+  parms2["v"] <- 10000 # m/d
+  std2 %<-% steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms2,
+                       nspec=3, names=c("N","P","Z"), method="runsteady")
+  
+  plot(std0, std1, std2, mfrow=c(3,1), grid=Grid$x.mid/1000, lty=1, lwd=2, xlab="km")
+  
+  ## and a dynamic simulation (= nonstationary)
+  time_seq <- seq(from = 0, to = 200, length.out=201)
+  dynamic  %<-% ode.1D(y=y_init, times=time_seq, func=riverNPZ, parms=parms, nspec=3)
+})
+```
+
+The normal sequential version took 15s and the multisession version 6.5s on my PC with 4 (i5 with 4 cores).
+
+Instead of parallelization, or in addition to it, it is also possible to make the model itself faster.
+Typical means are vectorization (that is already the case for the river model), and
+compiled code. Here the model is written in C or Fortran and then linked to R.
+Depending on the type of the model and how good it can be vectorized, simulations
+can then be 2 to 200 times faster, in particular if the model cannot be written
+in matrix notation. The C or Fortran code can be written by hand or created
+from a code generator. Here, manual programming is not that difficult, because
+only the numerical parts need to be encoded. More about this can be found in the
+[package vignettte](https://cran.r-project.org/web/packages/deSolve/vignettes/compiledCode.pdf)
+of **deSolve** and in a 
+[small tutorial](https://tpetzoldt.github.io/deSolve-compiled/deSolve-compiled.html) on Github.
+
+The C or Fortran code can also be created with a code generator, e.g. **cOde** [@Kaschek2019] or
+**odin** [@Fritzjohn2021]. Furthermore, package **rodeo** [@Kneis2017,@Kneis2021] can 
+generate **deSolve** compatible Fortran code directly from a tabular description 
+(stoichiometry table or Petersen-Gujer-matrix) of the model. It is also able to
+generate code for 1D models.
+
+## Visualization of multi-dimensional model results
+
+Dynamic models are multi-dimensional. Let's say we have a 1D model as follows, we
+have 3 dimensions (time, space, value) for each state variable. In such cases it makes
+sense to use volor image graphics (also called [Hovmöller diagrams](https://en.wikipedia.org/wiki/Hovm%C3%B6ller_diagram))
+or animations. 
+
+### Color image diagram
+
+Color image diagrams can be created with **R**'s `image` function. Some more options
+are available in packages **plot3D** [@plot3D] and **OceanView** [@OceanView].
+
+```{r river-npz-image, fig.height=8, fig.width=8}
+image(dynamic, xlab = "time, days", ylab = "Distance, m", grid= Grid$x.mid,
+      main =c("PO4","Phyto","Zoo"), add.contour=TRUE, mfrow = c(3, 1)) 
+```
+
+### Animated graphics
+
+Here we want to create an animated figure. To make it well readable, we use 
+filled polygons. First, a loop creates png images for each time step of the simulation
+and then **gifski** [@Ooms2021] puts this together and creates a gif-file.
+
+```{r river-npz-ani, fig.height=8, fig.width=8}
+plot_poly <- function(data, time) {
+  poly <- function(x, y, pcol, ylab, ylim) {
+    plot(x, y, type="n", las=1, xlab="", ylab="", ylim=ylim)
+    polygon(x, y, col=pcol, border=pcol, lty="blank")
+    mtext(side=1, line=1.5, text="km")
+    mtext(side=2, line=3.5, text=ylab, las=3)
+
+  }
+  y <- data[time, -1]
+  N <- y[1:nbox]
+  P <- y[(nbox+1):(2*nbox)]
+  Z  <- y[(2*nbox+1):(3*nbox)]
+  x   <- c(1, 1:nbox, nbox)
+  #cat("time ", time, "\n")
+
+  poly(x, c(0, N, 0), ylim=c(0,  1000), pcol="#a6cee3", ylab="P-PO4 (mmol/m3)")
+  poly(x, c(0, P, 0), ylim=c(0, 70000), pcol="#b2df8a", ylab="Phyto (mmol/m3)")
+  poly(x, c(0, Z, 0), ylim=c(0, 50000), pcol="#ee7f00", ylab="Zoo (mmol/m3)")
+}
+
+for (tt in time_seq)  {
+  png(paste0("river", 1000 + tt, ".png"), width=1600, height=800, pointsize = 18)
+  par(mfrow=c(3,1))
+  par(mar=c(3,5,.5,0), las=1, cex.axis=1.4, cex.lab=1.4, cex.main=2)
+  plot_poly(dynamic, tt)
+  dev.off()
+}
+
+library("gifski")
+gifski(dir(pattern="^river.*png$"), gif_file = "river.gif", width=1600, height=800, delay=1/25)
+```
+![](river.gif)
+## Finally
+
+Finally, we close the **future** workers and reset the strategy back to sequential.
+
+
+```{r close-workers}
+plan(strategy="sequential") # return to the default plan and close the workers
+```
+
+
+
+### References
+
+<div id="refs"></div>
+
+---- 
