@@ -140,7 +140,7 @@ P <- Y * (N0 - N)
 par(mfrow=c(1, 3))
 plot(d, N,     type="l")
 plot(d, P,     type="l")
-plot(d, N * P, type="l")
+plot(d, d * P, type="l")
 
 ## ---- steadystate, eval=FALSE, fig.height=3, fig.width=8----------------------
 #  state <- data.frame(
@@ -177,5 +177,5 @@ plot(d, N * P, type="l")
 #  par(mfrow = c(1, 3))
 #  plot(N     ~ d, data = state, type = "l")
 #  plot(P     ~ d, data = state, type = "l")
-#  plot(N * P ~ d, data = state, type = "l")
+#  plot(d * P ~ d, data = state, type = "l")
 
