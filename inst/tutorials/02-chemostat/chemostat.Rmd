@@ -216,7 +216,7 @@ plot(d, N * P, type="l")
 
 Here we see that with increasing $d$ the equilibrium phytoplankton
 concentration decreases and more nutrients are left over. The
-production, however (d*P) approaches an optimum at high dilution
+production, however (N*P) approaches an optimum at high dilution
 rates. If the dilution exceeds maximum growth, the chemostat dies out.
 
 ## Steady state solved numerically
