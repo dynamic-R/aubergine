@@ -2,8 +2,14 @@
 title: "Parallelisation with 'future' and Animations"
 author: "Thomas Petzoldt and Karline Soetaert"
 date: "July 2021"
-output: html_document
 bibliography: bib.bib
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Parallelisation with 'future' and Animations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8} 
 ---
 
 
@@ -193,7 +199,7 @@ plot_poly <- function(data, time) {
 }
 
 for (tt in time_seq)  {
-  png(paste0("river", 1000 + tt, ".png"), width=1600, height=800, pointsize = 18)
+  png(paste0("river", 1000 + tt, ".png"), width=800, height=600, pointsize = 18)
   par(mfrow=c(3,1))
   par(mar=c(3,5,.5,0), las=1, cex.axis=1.4, cex.lab=1.4, cex.main=2)
   plot_poly(dynamic, tt)
@@ -201,9 +207,10 @@ for (tt in time_seq)  {
 }
 
 library("gifski")
-gifski(dir(pattern="^river.*png$"), gif_file = "river.gif", width=1600, height=800, delay=1/25)
+gifski(dir(pattern="^river.*png$"), gif_file = "river.gif", width=800, height=600, delay=1/25)
 ```
 ![](river.gif)
+
 ## Finally
 
 Finally, we close the **future** workers and reset the strategy back to sequential.
