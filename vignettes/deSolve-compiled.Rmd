@@ -2,7 +2,7 @@
 title: 'deSolve: Use of Compiled Code'
 author: "Thomas Petzoldt and Karline Soetaert"
 date: "`r Sys.Date()`"
-bibliography: desolve.bib
+bibliography: aubergine.bib
 output: 
   rmarkdown::html_vignette:
     toc: true

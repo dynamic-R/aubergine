@@ -2,7 +2,7 @@
 title: "Forcing Functions and Events"
 author: "Karline Soetaert and Thomas Petzoldt"
 date: "`r Sys.Date()`"
-bibliography: desolve.bib
+bibliography: aubergine.bib
 output: 
   rmarkdown::html_vignette:
     toc: true
