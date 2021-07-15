@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Karline Soetaert and Thomas Petzoldt" />
+
+<meta name="date" content="2021-07-15" />
+
+<title>Forcing Functions and Events</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Forcing Functions and Events</h1>
+<h4 class="author">Karline Soetaert and Thomas Petzoldt</h4>
+<h4 class="date">2021-07-15</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#discontinuities-in-dynamic-models">Discontinuities in dynamic models</a></li>
+<li><a href="#example-1-time-varying-input">Example 1: Time-varying input</a></li>
+<li><a href="#events">Events</a></li>
+<li><a href="#example-2-a-patient-gets-injections-in-the-blood">Example 2: A patient gets injections in the blood</a></li>
+<li><a href="#example-3-an-event-triggered-by-a-root-a-bouncing-ball">Example 3: An event triggered by a root: A bouncing ball</a></li>
+<li><a href="#exercise-add-events-to-a-logistic-equation">Exercise: Add events to a logistic equation</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This short tutorial explains how differential equation models implemented in the <strong>R</strong> programming language for statistical computing <span class="citation">(R Core Team 2018)</span> and the add-on package <strong>deSolve</strong> <span class="citation">(Soetaert, Petzoldt, and Setzer 2010a, 2010b)</span> can be controlled by external input data.</p>
+<p>More about this can be found in the package documentation of <a href="https://cran.r-project.org/package=deSolve"><strong>deSolve</strong></a> and in various papers and books that are referenced at the <a href="https://deSolve-r-forge.r-project.org">deSolve home page</a>.</p>
+</div>
+<div id="discontinuities-in-dynamic-models" class="section level2">
+<h2>Discontinuities in dynamic models</h2>
+<p>Most solvers assume that dynamics is smooth. However, there can be several types of discontinuities:</p>
+<ol style="list-style-type: decimal">
+<li>Non-smooth external variables</li>
+<li>Discontinuities in the derivatives</li>
+<li>Discontinuites in the values of the state variables</li>
+</ol>
+<p>A solver does not have large problems with first two types of discontinuities, but changing the values of state variables is much more difficult.</p>
+<p>External variables of the first type are also called “inputs” or forcing functions and <code>?forcings</code> opens the corresponding <strong>deSolve</strong> help page.</p>
+<p><strong>Why external variables?</strong></p>
+<p>Some important phenomena are not explicitly included in a differential equation model, but imposed as a time series. (e.g. sunlight, important for plant growth is rarely “modeled”). Somehow, during the integration, the model needs to know the value of the external variable at each time step.</p>
+<p><strong>Implementation of forcing functions in R</strong></p>
+<p>R has an ingenious function that is especially suited for this task: function <code>approxfun</code>. This function is typically used in two steps. First an interpolating function is constructed. Here <code>approxfun</code> is a function that returns another function, in our case <code>afun</code> that contains both, the interpolation algorithm and the data. This is done before solving the differential equation model.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>afun <span class="ot">&lt;-</span> <span class="fu">approxfun</span>(data)</span></code></pre></div>
+<p>Then, within the derivative function, this interpolating function is called to provide the interpolated value at the requested time point (t):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tvalue <span class="ot">&lt;-</span> <span class="fu">afun</span>(t)</span></code></pre></div>
+</div>
+<div id="example-1-time-varying-input" class="section level2">
+<h2>Example 1: Time-varying input</h2>
+<p>The following example uses a Lotka-Volterra-type predator-prey model with an additional state equation for a ressource <span class="math inline">\(S\)</span>, e.g. a nutrient. This resource is consumed by the producer <span class="math inline">\(P\)</span> that is itself consumed by a consumer <span class="math inline">\(C\)</span>. The resource does not regenerate itself, but it can be imported from an external source. The external input is described as a time dependent signal.</p>
+<p><strong>Step 1 Create an artificial time-series</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">100</span>, <span class="at">by =</span> <span class="fl">0.1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>signal <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">times =</span> times, <span class="at">import =</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="fu">length</span>(times)))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>signal<span class="sc">$</span>import <span class="ot">&lt;-</span> <span class="fu">ifelse</span>((<span class="fu">trunc</span>(signal<span class="sc">$</span>times) <span class="sc">%%</span> <span class="dv">2</span> <span class="sc">==</span> <span class="dv">0</span>), <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>signal[<span class="dv">8</span><span class="sc">:</span><span class="dv">12</span>,]</span></code></pre></div>
+<pre><code>##    times import
+## 8    0.7      0
+## 9    0.8      0
+## 10   0.9      0
+## 11   1.0      1
+## 12   1.1      1</code></pre>
+<p><strong>Step 2: Create the interpolating function, using <code>approxfun</code></strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">approxfun</span>(signal, <span class="at">rule =</span> <span class="dv">2</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">input</span>(<span class="fu">seq</span>(<span class="at">from =</span> <span class="fl">0.98</span>, <span class="at">to =</span> <span class="fl">1.01</span>, <span class="at">by =</span> <span class="fl">0.005</span>))</span></code></pre></div>
+<pre><code>## [1] 0.80 0.85 0.90 0.95 1.00 1.00 1.00</code></pre>
+<p><strong>Step 3: Use the interpolation function in the ODE function</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>SPCmod <span class="ot">&lt;-</span> <span class="cf">function</span>(t, x, parms) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(parms, x)), {</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    import <span class="ot">&lt;-</span> <span class="fu">input</span>(t)   <span class="co"># &lt;---- here</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    dS <span class="ot">&lt;-</span> import <span class="sc">-</span> b <span class="sc">*</span> S <span class="sc">*</span> P <span class="sc">+</span> g <span class="sc">*</span> C</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    dP <span class="ot">&lt;-</span> c <span class="sc">*</span> S <span class="sc">*</span> P <span class="sc">-</span> d <span class="sc">*</span> C <span class="sc">*</span> P</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    dC <span class="ot">&lt;-</span> e <span class="sc">*</span> P <span class="sc">*</span> C <span class="sc">-</span> f <span class="sc">*</span> C</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    res <span class="ot">&lt;-</span> <span class="fu">c</span>(dS, dP, dC)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(res, <span class="at">signal =</span> import)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">b =</span> <span class="fl">0.1</span>, <span class="at">c =</span> <span class="fl">0.1</span>, <span class="at">d =</span> <span class="fl">0.1</span>, <span class="at">e =</span> <span class="fl">0.1</span>, <span class="at">f =</span> <span class="fl">0.1</span>, <span class="at">g =</span> <span class="dv">0</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>xstart <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">S =</span> <span class="dv">1</span>, <span class="at">P =</span> <span class="dv">1</span>, <span class="at">C =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><strong>Step 4: Solve the system and plot the result </strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">ode</span>(<span class="at">y =</span> xstart, <span class="at">times =</span> times, <span class="at">func =</span> SPCmod, parms)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="600" height="400" style="display: block; margin: auto;" /></p>
+</div>
+<div id="events" class="section level2">
+<h2>Events</h2>
+<p>An event is a discontinuity in a dynamic model, when the values of state variables change abruptly. In most programming environments, events are techically cumbersome, because when an event occurs, the simulation needs to be restarted. This can be done by chaining seperate simulations in loops, but the resulting code can quickly become messy and difficult to read.</p>
+<p>The good news is, that package *deSolve** has a built-in event handling mechanism, where events are part of a model, so that no restart will be necessary by the user.</p>
+<p><strong>Two different types of events in R</strong></p>
+<p>The event handling mechanism of <strong>R/deSolve</strong> can handle two different types of events:</p>
+<ol style="list-style-type: decimal">
+<li>Events occur at known times
+<ul>
+<li>Simple changes can be specified in a data.frame with:
+<ul>
+<li>name of state variable that is affected</li>
+<li>the time of the event</li>
+<li>the magnitude of the event</li>
+<li>event method (“replace,” “add,” “multiply”)</li>
+</ul></li>
+<li>More complex events can be specified in an event function that returns the changed values of the state variables <code>function(t, y, parms, ...)</code></li>
+</ul></li>
+<li>Events occur when certain conditions are met:
+<ul>
+<li>Event is triggered by a root function</li>
+<li>Event is specified in an event function</li>
+</ul></li>
+</ol>
+<p>The details are explained at the <code>?events</code> help page, but let us now show a small example.</p>
+</div>
+<div id="example-2-a-patient-gets-injections-in-the-blood" class="section level2">
+<h2>Example 2: A patient gets injections in the blood</h2>
+<p>The example describes is a typical pharmacokinetic problem. The aim is to follow the concentration of the drug in the blood and the tissue of the person over a relatively long time (e.g. hours or days), but the injection takes only a few seconds. One idea to model this would be a time dependent forcing variable for the drug.</p>
+<p>This can work, but in most cases it will be very inefficient. The reason is, that the simulation time step of the solver must always be shorter than the time step of an external discrete forcing function. Otherwise, the solver may jump over the the short time periof when the injection occurs. It is obvious that is not very clever to simulate a model with resolution of seconds over several days, just to make sure that a single injection is not overlooked.</p>
+<p>Events are a better appraoch for this problem. Then the ODE can be efficiently solved with a (relatively long) automatic time step, and the event mechanism stops it when something important occurs.</p>
+<p><strong>Problem Formulation</strong></p>
+<p>The model consists then of two parts:</p>
+<ol style="list-style-type: decimal">
+<li>an ODE model for the dynamics between the events
+<ul>
+<li>the initial drug concentration is zero</li>
+<li>if a drug is present, it decays with rate <span class="math inline">\(b\)</span></li>
+</ul></li>
+<li>an event for the injection
+<ul>
+<li>if an injection occurs, the state variable <span class="math inline">\(blood\)</span> is directly changed</li>
+</ul></li>
+</ol>
+<p><strong>ODE model of 1st order drug decay:</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pharmaco <span class="ot">&lt;-</span> <span class="cf">function</span>(t, blood, p) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  dblood <span class="ot">&lt;-</span> <span class="sc">-</span> b <span class="sc">*</span> blood</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(dblood)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fl">0.6</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>yini <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">blood =</span> <span class="dv">0</span>)</span></code></pre></div>
+<p><strong>The event function</strong></p>
+<p>The events can be specified in an event data.frame, containing the state variable that is to be manipulated (<code>blood</code>), the time steps, when the events occur (<code>time</code>), the amount of change (<code>value</code>) and the method, how the state variable is changed, for example:</p>
+<ul>
+<li>Daily doses, at same time of day</li>
+<li>Injection makes the concentration in the blood increase by 40 units.</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>injectevents <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">var =</span> <span class="st">&quot;blood&quot;</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">time =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">20</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">value =</span> <span class="dv">40</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">method =</span> <span class="st">&quot;add&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(injectevents)</span></code></pre></div>
+<pre><code>##     var time value method
+## 1 blood    0    40    add
+## 2 blood    1    40    add
+## 3 blood    2    40    add
+## 4 blood    3    40    add
+## 5 blood    4    40    add
+## 6 blood    5    40    add</code></pre>
+<p><strong>Solve the model</strong></p>
+<ul>
+<li>Pass events to the solver in a list</li>
+<li>All solvers of <strong>deSolve</strong> can handle events</li>
+<li>Here we use the “implicit Adams” method</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">10</span>, <span class="at">by =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">24</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>outDrug <span class="ot">&lt;-</span> <span class="fu">ode</span>(<span class="at">func =</span> pharmaco, <span class="at">times =</span> times, <span class="at">y =</span> yini,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">parms =</span> <span class="cn">NULL</span>, <span class="at">method =</span> <span class="st">&quot;impAdams&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">events =</span> <span class="fu">list</span>(<span class="at">data =</span> injectevents))</span></code></pre></div>
+<p><strong>Plot the result</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(outDrug)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="600" height="400" style="display: block; margin: auto;" /></p>
+</div>
+<div id="example-3-an-event-triggered-by-a-root-a-bouncing-ball" class="section level2">
+<h2>Example 3: An event triggered by a root: A bouncing ball</h2>
+<p><strong>Problem formulation</strong></p>
+<ul>
+<li>A ball is thrown vertically from the ground: <span class="math inline">\(y(0) = 0\)</span></li>
+<li>Initial velocity: <span class="math inline">\(y&#39; = 10 \mathrm m s^{-1}\)</span>; acceleration <span class="math inline">\(g = 9.8 \mathrm m s^{-2}\)</span></li>
+<li>When ball hits the ground, it bounces.</li>
+</ul>
+<p><strong>ODEs describe height of the ball above the ground (y)</strong></p>
+<p>The ODEs can be specified as 2nd order ODE, where <span class="math inline">\(y\)</span> (<span class="math inline">\(\mathrm m\)</span>) is the height above ground, <span class="math inline">\(y&#39;\)</span> (<span class="math inline">\(\mathrm m s^{-1}\)</span>) is the velocity and <span class="math inline">\(y&#39;&#39;\)</span> (<span class="math inline">\(\mathrm m s^{-2}\)</span>) is the acceleration:</p>
+<p><span class="math display">\[
+\begin{align}
+y&#39;&#39; &amp;= -g  \\
+y(0) &amp;= 0 \\
+y&#39;(0) &amp;= 10
+\end{align}
+\]</span></p>
+<p>To solve a 2nd order ODE numerically, it is first transformed to a system of two 1st order ODEs by substituting <span class="math inline">\(y&#39;\)</span> with <span class="math inline">\(y_2\)</span>. This forms then the following 1st order ODE:</p>
+<p><span class="math display">\[
+\begin{align}
+y_1&#39; &amp;= y_2  \\
+y_2&#39; &amp;= -g  \\
+y1(0) &amp;= 0 \\
+y2(0) &amp;= 10
+\end{align}
+\]</span></p>
+<p><strong>Dynamics inbetween events</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(deSolve)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ball <span class="ot">&lt;-</span> <span class="cf">function</span>(t, y, parms) {</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  dy1 <span class="ot">&lt;-</span> y[<span class="dv">2</span>]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  dy2 <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">9.8</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="fu">c</span>(dy1, dy2))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>yini <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">height =</span> <span class="dv">0</span>, <span class="at">velocity =</span> <span class="dv">10</span>)</span></code></pre></div>
+<p><strong>The Ball hits the ground and bounces</strong></p>
+<p>The root event occurs if the ball hits the ground:</p>
+<ul>
+<li>The ground is where height = 0</li>
+<li>The root function is 0 when <span class="math inline">\(y_1\)</span> = 0</li>
+</ul>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>rootfunc <span class="ot">&lt;-</span> <span class="cf">function</span>(t, y, parms) <span class="fu">return</span> (y[<span class="dv">1</span>])</span></code></pre></div>
+<p><strong>Event: the ball bounces</strong></p>
+<ul>
+<li>The velocity changes its sign (-) and is reduced by 10%</li>
+<li>Event function returns changed values of both state variables</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>eventfunc <span class="ot">&lt;-</span> <span class="cf">function</span>(t, y, parms) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  y[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  y[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">0.9</span><span class="sc">*</span>y[<span class="dv">2</span>]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(y)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><strong>Solve the model</strong></p>
+<ul>
+<li>Inform solver that event is triggered by root (root = TRUE)</li>
+<li>Pass event function to solver</li>
+<li>Pass root function to solver</li>
+</ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">20</span>, <span class="at">by =</span> <span class="fl">0.01</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">ode</span>(<span class="at">times =</span> times, <span class="at">y =</span> yini, <span class="at">func =</span> ball,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="at">parms =</span> <span class="cn">NULL</span>, <span class="at">rootfun =</span> rootfunc,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="at">events =</span> <span class="fu">list</span>(<span class="at">func =</span> eventfunc, <span class="at">root =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<p><strong>Get information about the root (hitting the ground)</strong></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(out)<span class="sc">$</span>troot</span></code></pre></div>
+<pre><code>##  [1]  2.040816  3.877551  5.530612  7.018367  8.357347  9.562428 10.647001
+##  [8] 11.623117 12.501621 13.292274 14.003862 14.644290 15.220675 15.739420
+## [15] 16.206290 16.626472 17.004635 17.344981 17.651291 17.926970 18.175080
+## [22] 18.398378 18.599345 18.780215 18.942998 19.089501 19.221353 19.340019
+## [29] 19.446818 19.542936 19.629441 19.707294 19.777362 19.840421 19.897174
+## [36] 19.948250 19.994217</code></pre>
+<p><strong>Plot results</strong></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out, <span class="at">select =</span> <span class="st">&quot;height&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="600" height="400" style="display: block; margin: auto;" /></p>
+<p><strong>Create movie-like output</strong></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">2001</span>, <span class="dv">10</span>)) {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(out, <span class="at">which =</span> <span class="st">&quot;height&quot;</span>, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">1</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="st">&quot;&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Height&quot;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(<span class="fu">t</span>(out[i,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]), <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="dv">1</span>, <span class="at">cex =</span> <span class="dv">2</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">bg =</span> <span class="fu">rainbow</span>(<span class="dv">30</span>, <span class="at">v =</span> <span class="fl">0.6</span>)[<span class="dv">20</span><span class="sc">-</span><span class="fu">abs</span>(out[i,<span class="dv">3</span>])<span class="sc">+</span><span class="dv">1</span>])</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Sys.sleep</span>(<span class="fl">0.01</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="exercise-add-events-to-a-logistic-equation" class="section level2">
+<h2>Exercise: Add events to a logistic equation</h2>
+<p>The logistic equation is a fundamental theoretical and sometimes also practical model, where population growth is described by a population growth rate <span class="math inline">\(r\)</span> and a carrying capacity <span class="math inline">\(K\)</span>. It is the origin of the well-known terms “r strategists” and “K strategists.”</p>
+<p><strong>ODE: logistic equation of population growth</strong></p>
+<p>Let’s assume the following logistic equation:</p>
+<p><span class="math display">\[
+y&#39; = r\cdot y \cdot \left(1-\frac{y}{K}\right)
+\]</span></p>
+<p>with <span class="math inline">\(r=1\)</span>, <span class="math inline">\(K=10\)</span> and <span class="math inline">\(y_0=2\)</span></p>
+<p><strong>Events: the population is harvested according to several strategies</strong></p>
+<ol style="list-style-type: decimal">
+<li>No harvesting</li>
+<li>Every 2 days the population’s density is reduced to 50%</li>
+<li>When the population approaches 80% of its carrying capacity, its density is halved.</li>
+</ol>
+<p><strong>Tasks</strong></p>
+<ul>
+<li>Run the model for 20 days</li>
+<li>Implement the first strategy in a <code>data.frame</code></li>
+<li>Second strategy: requires root and event function</li>
+</ul>
+<p>Use the code fragment below as a template.</p>
+<p><strong>Template</strong></p>
+<p>Copy the template in your favorite editor (e.g. RStudio) and fill the gaps.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Logistic growth with harvesting</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(deSolve)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>derivs <span class="ot">&lt;-</span> <span class="cf">function</span>(t, y, parms) </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(r <span class="sc">*</span> y <span class="sc">*</span> (<span class="dv">1</span><span class="sc">-</span>y<span class="sc">/</span>K))</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>yini <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">y =</span> <span class="dv">2</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">20</span>, <span class="at">by =</span> <span class="fl">0.1</span>)</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co"># First run: unharvested</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>out1 <span class="ot">&lt;-</span> <span class="fu">ode</span>(<span class="at">y =</span> yini, <span class="at">times =</span> times, <span class="at">func =</span> derivs, <span class="at">parms =</span> <span class="cn">NULL</span>)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Second run: harvest at preset times</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="do">## ****  Fill in this part:  ******</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>harvest <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( </span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>                    <span class="at">var =</span>   , <span class="co"># what is the name of the variable, </span></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>                    <span class="at">time =</span>  , <span class="co"># at which times do the events occur,</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>                    <span class="at">value =</span> , <span class="co"># what is the value </span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> )<span class="co"># what is the method used (&quot;multiply&quot;, &quot;add&quot;, ...)</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>out2 <span class="ot">&lt;-</span> <span class="fu">ode</span>(<span class="at">y =</span> yini, <span class="at">times =</span> times, <span class="at">func =</span> derivs, <span class="at">parms =</span> <span class="cn">NULL</span>,</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>            <span class="at">events =</span> <span class="fu">list</span>(<span class="at">data =</span> harvest))</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Third run: harvest when critical density is readhed</span></span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>rootfunc  <span class="ot">&lt;-</span> <span class="cf">function</span>(t, y, p) </span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a><span class="co">#  **** Fill in this part:   a root is when y = 0.8*K ****</span></span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>( )</span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>eventfunc <span class="ot">&lt;-</span> <span class="cf">function</span>(t, y, p) </span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a><span class="co"># **** Fill in this part:  variable y is reduced with 50%  ****</span></span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>( )</span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a>out3 <span class="ot">&lt;-</span> <span class="fu">ode</span>(<span class="at">y =</span> yini, <span class="at">times =</span> times, <span class="at">func =</span> derivs, <span class="at">parms =</span> <span class="cn">NULL</span>,</span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a>            <span class="at">rootfun =</span> rootfunc, <span class="at">events =</span> <span class="fu">list</span>(<span class="at">func =</span> eventfunc, <span class="at">root =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot different scenarios</span></span>
+<span id="cb22-51"><a href="#cb22-51" aria-hidden="true" tabindex="-1"></a><span class="do">## =============================================================================</span></span>
+<span id="cb22-52"><a href="#cb22-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-53"><a href="#cb22-53" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out1, out2, out3, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb22-54"><a href="#cb22-54" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span> (<span class="st">&quot;bottomright&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb22-55"><a href="#cb22-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;unharvested&quot;</span>, <span class="st">&quot;2-day harvest&quot;</span>, <span class="st">&quot;harvest at 80% of K&quot;</span>))</span></code></pre></div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-RCore2018" class="csl-entry">
+R Core Team. 2018. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-Soetaert2010c" class="csl-entry">
+Soetaert, Karline, Thomas Petzoldt, and R. Woodrow Setzer. 2010a. <span>“<span class="nocase">Solving Differential Equations in R</span>.”</span> <em>The R Journal</em> 2 (2): 5–15. <a href="https://journal.r-project.org/archive/2010-2/RJournal_2010-2_Soetaert~et~al.pdf">https://journal.r-project.org/archive/2010-2/RJournal_2010-2_Soetaert~et~al.pdf</a>.
+</div>
+<div id="ref-Soetaert2010a" class="csl-entry">
+———. 2010b. <span>“Solving Differential Equations in <span>R</span>: Package <span><span class="nocase">de</span>Solve</span>.”</span> <em>Journal of Statistical Software</em> 33 (9): 1–25. <a href="https://doi.org/10.18637/jss.v033.i09">https://doi.org/10.18637/jss.v033.i09</a>.
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
