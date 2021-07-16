@@ -5,7 +5,7 @@ AUBtutorial <- function(x = c(
     "02-chemostat",
     "03-npz-model",
     "04-npz-in-a-river",
-    "05-npzd-model in a batch")) {
+    "05-npzd-model")) {
 
   LL <- as.character(formals(AUBtutorial)$x[-1])
 
