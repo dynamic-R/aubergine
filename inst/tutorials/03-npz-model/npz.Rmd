@@ -86,7 +86,7 @@ Following the equations of $P$ and $N$ of the chemostat:
 we can add a 3rd equation for zooplankton $Z$ as:
 
 \begin{align}
-\frac{dZ}{dt} &= c_{asseff} \cdot c_{pn} \cdot r_{zgraz} \cdot \frac{P}{k_P + P} - r_{zloss} \cdot Z - d \cdot Z
+\frac{dZ}{dt} &= c_{asseff} \cdot c_{pn} \cdot r_{zgraz} \cdot \frac{P}{k_P + P} \cdot Z - r_{zloss} \cdot Z - d \cdot Z
 \end{align}
 
 with $c_{asseff}$ = assimilation efficiency, $r_{zgraz}$ = zooplankton grazing 
@@ -106,10 +106,14 @@ so we can write the full system:
     \\
     \text{and the state equations:}\\
     \frac{dN}{dt}   &= c_{pn} \cdot (-p_{growth} + n_{recycling}) + d \cdot (N_0 - N)\\
-    \frac{dP}{dt}   &= p_{growth} - z_{grazing}             - d \cdot P\\
-    \frac{dZ}{dt}   &= z_{growth} - r_{zloss}  \cdot Z      - d \cdot Z
+    \frac{dP}{dt}   &= p_{growth} - z_{grazing}             + d \cdot (0 - P)\\
+    \frac{dZ}{dt}   &= z_{growth} - r_{zloss}  \cdot Z      + d \cdot (0 - Z)
 \end{align}
 
+Formulations like $d \cdot (0-P)$ were chosen for didactic reasons. This is the 
+transport term "import - export". This can then be extended to the 1D case where 
+the values given in the parenthesis (e.g. 0, $N_0$) are then called upper 
+and lower boundary conditions.
 
 ### Implementation of the NPZ model
 
