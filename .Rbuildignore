@@ -1,6 +1,7 @@
 ^Rplots.pdf$
 work
 LICENSE
+LICENCE
 README.md
 ^.*\.Rproj$
 ^\.Rproj\.user$

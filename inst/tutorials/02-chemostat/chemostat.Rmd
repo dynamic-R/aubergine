@@ -272,7 +272,7 @@ for (i in 1:nrow(state)) {
 par(mfrow = c(1, 3))
 plot(N     ~ d, data = state, type = "l")
 plot(P     ~ d, data = state, type = "l")
-plot(N * P ~ d, data = state, type = "l")
+plot(d * P ~ d, data = state, type = "l")
 ``` 
 
 We use a `for`-loop here for simplicity, even if list-based approaches

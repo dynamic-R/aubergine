@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Karline Soetaert and Thomas Petzoldt" />
+
+
+<title>1D NPZ Model in a River</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">1D NPZ Model in a River</h1>
+<h4 class="author">Karline Soetaert and Thomas Petzoldt</h4>
+<h4 class="date">July-2021</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#from-0d-to-1d">From 0D to 1D</a></li>
+<li><a href="#the-1d-npz-model">The 1D NPZ model</a></li>
+<li><a href="#solution">Solution</a></li>
+<li><a href="#the-1d-npz-model---scenarios">The 1D NPZ model - scenarios</a></li>
+<li><a href="#outlook">Outlook</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The NPZ model implemented in the previous tutorial can easily be extended from 0D to 1D, using the R-package <strong>ReacTran</strong> <span class="citation">(K. Soetaert and Meysman 2012)</span>. Basically,</p>
+<ul>
+<li>the spatial domain is subdivided in a number of grid cells (function <code>setup.grid.1D</code>), and</li>
+<li>the state equations are vectorized so that they are solved for all grid cells in parallel.</li>
+<li>transport (advective flow and mixing) is performed by function <code>tran.1D</code></li>
+<li>the numerical methods <code>ode.1D</code> and <code>steady.1D</code> from <strong>deSolve</strong> and <strong>rootSolve</strong> are optimised to solve one-dimensional transport problems.</li>
+</ul>
+</div>
+<div id="from-0d-to-1d" class="section level2">
+<h2>From 0D to 1D</h2>
+<p>We start with the 0D chemostat model from previous tutorial that describes the dynamics of Nutrients and Phytoplankton:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span> (deSolve)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>chemostatNP <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(y, parms)), {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    p_growth <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># mass balance = process rates   + transport</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    dN_dt   <span class="ot">&lt;-</span>  <span class="sc">-</span> c_pn <span class="sc">*</span> p_growth <span class="sc">+</span> d<span class="sc">*</span>(N0<span class="sc">-</span>N)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    dP_dt   <span class="ot">&lt;-</span>           p_growth <span class="sc">+</span> d<span class="sc">*</span>(<span class="dv">0</span> <span class="sc">-</span>P)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>parms<span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">r_pgrow=</span><span class="fl">0.5</span>, <span class="at">k_n=</span><span class="fl">1.0</span>, <span class="at">c_pn=</span><span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="at">d=</span><span class="fl">0.1</span>, <span class="at">N0=</span><span class="dv">5</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>y    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">N =</span> <span class="dv">5</span>, <span class="at">P =</span> <span class="dv">1</span>)  </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>std  <span class="ot">&lt;-</span> <span class="fu">steady</span>(y, <span class="at">times=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="cn">Inf</span>), <span class="at">func=</span>chemostatNP, <span class="at">parms=</span>parms,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>) <span class="co"># solve model</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>std<span class="sc">$</span>y</span></code></pre></div>
+<pre><code>##      N      P 
+##   0.25 503.50</code></pre>
+<p>The code below shows how this zero-dimensional NP model is extended to 1D.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ReacTran)                                               <span class="do">## CHANGED ##</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>riverNP <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(parms), {    <span class="co"># was:  as.list(c(y, parms))        ## CHANGED ##</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>   <span class="co"># state vectors need to be extracted from y                  ## NEW ##</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    N <span class="ot">&lt;-</span> y[        <span class="dv">1</span> <span class="sc">:</span>(<span class="dv">1</span><span class="sc">*</span>nbox)]   </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    P <span class="ot">&lt;-</span> y[(<span class="dv">1</span><span class="sc">*</span>nbox<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(<span class="dv">2</span><span class="sc">*</span>nbox)]   </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    p_growth  <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>   <span class="co"># transport: C.up=upstream conc, v=flow velocity             ## NEW ##</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    n_transport <span class="ot">&lt;-</span> <span class="fu">tran.1D</span>(<span class="at">C=</span>N, <span class="at">C.up=</span>N0, <span class="at">v=</span>v, <span class="at">dx=</span>Grid)  </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    p_transport <span class="ot">&lt;-</span> <span class="fu">tran.1D</span>(<span class="at">C=</span>P, <span class="at">C.up=</span>P0, <span class="at">v=</span>v, <span class="at">dx=</span>Grid)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>   <span class="co"># mass balance = process rates + transport</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    dN_dt <span class="ot">&lt;-</span> c_pn <span class="sc">*</span> (<span class="sc">-</span>p_growth)  <span class="sc">+</span> n_transport<span class="sc">$</span>dC               <span class="do">## CHANGED ##</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    dP_dt <span class="ot">&lt;-</span>          p_growth   <span class="sc">+</span> p_transport<span class="sc">$</span>dC</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_pgrow =</span> <span class="fl">0.5</span>,   <span class="co"># phytoplankton growth parameter (1/d)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_n     =</span> <span class="fl">0.5</span>,   <span class="co"># Monod ct of phyto growth on nutrient (mmol/m3)</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_p     =</span> <span class="dv">100</span>,   <span class="co"># Monod ct of zoo grazing on phyto (mmol/m3)</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_pn    =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="co"># conversion from phosporus to phyto (P:C)</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">v       =</span> <span class="dv">10000</span>, <span class="co"># flow velocity (m/d)                        ## NEW ##</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">N0      =</span> <span class="dv">500</span>,   <span class="co"># nutrient (PO4) in inflow (mmolP/m3)    </span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">P0      =</span> <span class="dv">10</span>     <span class="co"># algae in inflow (mmolC/m3)</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># morphology: divide the river into 500 boxes                   ## NEW ##</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>Length <span class="ot">&lt;-</span> <span class="fl">500e3</span>  <span class="co"># length of the river (m)</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>nbox   <span class="ot">&lt;-</span> <span class="dv">500</span>    <span class="co"># number of 1D grid cells</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>Grid   <span class="ot">&lt;-</span> <span class="fu">setup.grid.1D</span>(<span class="at">L =</span> Length, <span class="at">N =</span> nbox)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Phyto as C and Phosphorus P (mol/m3) - each nbox long         ## CHANGED ##</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>N_init  <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">5</span>, <span class="at">times=</span>nbox)  <span class="co"># mmolP/m3</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>P_init  <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="at">times=</span>nbox) <span class="co"># mmolC/m3</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>y_init  <span class="ot">&lt;-</span> <span class="fu">c</span>(N_init, P_init)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>std <span class="ot">&lt;-</span> <span class="fu">steady.1D</span>(y_init, <span class="at">times=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="cn">Inf</span>), <span class="at">func=</span>riverNP, <span class="at">parms=</span>parms,</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nspec=</span><span class="dv">2</span>, <span class="at">names=</span><span class="fu">c</span>(<span class="st">&quot;N&quot;</span>,<span class="st">&quot;P&quot;</span>),                     <span class="do">## NEW ##</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(std, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">grid=</span>Grid<span class="sc">$</span>x.mid<span class="sc">/</span><span class="dv">1000</span>,                   <span class="do">## CHANGED ## </span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>     <span class="at">lty=</span><span class="dv">1</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">xlab=</span><span class="st">&quot;km&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-1d-npz-model" class="section level2">
+<h2>The 1D NPZ model</h2>
+<p>You now get the extended NPZ model in the chemostat:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span> (deSolve)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>chemostatNPZ <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(y, parms)), {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    p_growth  <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    z_grazing <span class="ot">&lt;-</span> r_zgraz <span class="sc">*</span> P <span class="sc">/</span> (k_p <span class="sc">+</span> P) <span class="sc">*</span> Z</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    z_loss    <span class="ot">&lt;-</span> r_zloss <span class="sc">*</span> Z</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># mass balance = process rates   + transport</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    dN_dt <span class="ot">&lt;-</span> c_pn<span class="sc">*</span>(<span class="sc">-</span>p_growth <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">-</span> asseff) <span class="sc">*</span> z_grazing <span class="sc">+</span> z_loss) <span class="sc">+</span> d <span class="sc">*</span> (N0 <span class="sc">-</span> N)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    dP_dt <span class="ot">&lt;-</span>        p_growth <span class="sc">-</span>                z_grazing           <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> P)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    dZ_dt <span class="ot">&lt;-</span>                        asseff  <span class="sc">*</span> z_grazing <span class="sc">-</span> z_loss  <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> Z)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt, dZ_dt))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>parms<span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">r_pgrow=</span><span class="fl">0.5</span>, <span class="at">r_zgraz=</span><span class="fl">0.4</span>, <span class="at">r_zloss=</span><span class="fl">0.01</span>, <span class="at">k_n=</span><span class="fl">0.5</span>, </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">k_p=</span><span class="dv">100</span>, <span class="at">c_pn=</span><span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="at">asseff=</span><span class="fl">0.3</span>, <span class="at">d=</span><span class="fl">0.11</span>, <span class="at">N0=</span><span class="dv">500</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>y   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">N=</span><span class="dv">5</span>, <span class="at">P=</span><span class="dv">1</span>, <span class="at">Z=</span><span class="dv">1</span>)  </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>std <span class="ot">&lt;-</span> <span class="fu">steady</span>(y, <span class="at">times=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="cn">Inf</span>), <span class="at">func=</span>chemostatNPZ, <span class="at">parms=</span>parms, <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>) </span></code></pre></div>
+<p>Your task is to extend the NPriver model to include the Z component:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ReacTran)           </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>riverNPZ <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(parms), {    </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>   <span class="co"># state vectors need to be extracted from y                 </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    N <span class="ot">&lt;-</span> y[        <span class="dv">1</span> <span class="sc">:</span>(<span class="dv">1</span><span class="sc">*</span>nbox)]   </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    P <span class="ot">&lt;-</span> y[(<span class="dv">1</span><span class="sc">*</span>nbox<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(<span class="dv">2</span><span class="sc">*</span>nbox)]   </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    Z <span class="ot">&lt;-</span> ..                                                     <span class="do">## CHANGE ##</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    p_growth  <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    z_grazing <span class="ot">&lt;-</span> ...                                            <span class="do">## ADD ##</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    z_loss    <span class="ot">&lt;-</span> ...                                            <span class="do">## ADD ##</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>   <span class="co"># transport: C.up=upstream conc, v=flow velocity              </span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    n_transport <span class="ot">&lt;-</span> <span class="fu">tran.1D</span>(<span class="at">C=</span>N, <span class="at">C.up=</span>N0, <span class="at">v=</span>v, <span class="at">dx=</span>Grid)  </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    p_transport <span class="ot">&lt;-</span> <span class="fu">tran.1D</span>(<span class="at">C=</span>P, <span class="at">C.up=</span>P0, <span class="at">v=</span>v, <span class="at">dx=</span>Grid)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    z_transport <span class="ot">&lt;-</span> ..                                           <span class="do">## ADD ##</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>   <span class="co"># mass balance = process rates + transport</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    dN_dt <span class="ot">&lt;-</span> c_pn <span class="sc">*</span> (<span class="sc">-</span>p_growth)  <span class="sc">+</span> n_transport<span class="sc">$</span>dC               <span class="do">## CHANGE ##</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    dP_dt <span class="ot">&lt;-</span>          p_growth   <span class="sc">+</span> p_transport<span class="sc">$</span>dC               <span class="do">## CHANGE ##</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    dZ_dt <span class="ot">&lt;-</span> ..                                                 <span class="do">## ADD ##</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt, ..))                                   <span class="do">## CHANGE ##</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_pgrow  =</span> <span class="fl">0.5</span>,   <span class="co"># phytoplankton growth parameter (1/d)</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zgraz  =</span> <span class="fl">0.4</span>,   <span class="co"># zooplankton ingestion parameter (1/d)</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zloss  =</span> <span class="fl">0.01</span>,  <span class="co"># zooplankton loss parameter (1/d)</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_n      =</span> <span class="fl">0.5</span>,   <span class="co"># Monod ct of phyto growth on nutrient (mmol/m3)</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_p      =</span> <span class="dv">100</span>,   <span class="co"># Monod ct of zoo grazing on phyto (mmol/m3)</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_pn     =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="co"># conversion from phosporus P to phyto C (P:C)</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">asseff   =</span> <span class="fl">0.3</span>,   <span class="co"># assimilation efficiency of zoo (-)</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">v        =</span> <span class="dv">10000</span>, <span class="co"># flow velocity (m/d)</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">N0       =</span> <span class="dv">500</span>,   <span class="co"># nutrient (PO4) in inflow (mmolP/m3)</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">P0       =</span> <span class="dv">10</span>,    <span class="co"># algae in inflow (mmolC/m3)</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">Z0       =</span> <span class="dv">1</span>      <span class="co"># zooplankton in inflow (mmolC/m3)</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co"># river morphology</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>Length <span class="ot">&lt;-</span> <span class="fl">500e3</span>  <span class="co"># length of the river (m)</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>nbox   <span class="ot">&lt;-</span> <span class="dv">500</span>    <span class="co"># number of 1D grid cells</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>Grid   <span class="ot">&lt;-</span> <span class="fu">setup.grid.1D</span>(<span class="at">L =</span> Length, <span class="at">N =</span> nbox)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Zoo and Phyto as C and Phosphorus P (mol/m3)</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>N_init  <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">500</span>, <span class="at">times=</span>nbox) <span class="co"># mmolP/m3</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>P_init  <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">100</span>, <span class="at">times=</span>nbox) <span class="co"># mmolC/m3</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>Z_init  <span class="ot">&lt;-</span> ..                                                   <span class="do">## ADD ##</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>y_init  <span class="ot">&lt;-</span> <span class="fu">c</span>(N_init, P_init, ..)                                <span class="do">## ADD ##</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>std <span class="ot">&lt;-</span> <span class="fu">steady.1D</span>(<span class="at">y=</span>y_init, <span class="at">time=</span><span class="dv">0</span>, <span class="at">func=</span>riverNPZ, <span class="at">parms=</span>parms,</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nspec=</span><span class="dv">2</span>, <span class="at">names=</span><span class="fu">c</span>(<span class="st">&quot;N&quot;</span>,<span class="st">&quot;P&quot;</span>),                     <span class="do">## CHANGE ##</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>                 <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>)</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(std, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">grid=</span>Grid<span class="sc">$</span>x.mid<span class="sc">/</span><span class="dv">1000</span>, <span class="at">xlab=</span><span class="st">&quot;km&quot;</span>)</span></code></pre></div>
+</div>
+<div id="solution" class="section level2">
+<h2>Solution</h2>
+<p>The code of the solution is not included in the document, but can be seen in the source code.</p>
+<p>Now the steady state can be found with function <code>steady.1D</code> from package <strong>rootSolve</strong>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>std <span class="ot">&lt;-</span> <span class="fu">steady.1D</span>(<span class="at">y=</span>y_init, <span class="at">time=</span><span class="dv">0</span>, <span class="at">func=</span>riverNPZ, <span class="at">parms=</span>parms,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nspec=</span><span class="dv">3</span>, <span class="at">names=</span><span class="fu">c</span>(<span class="st">&quot;N&quot;</span>,<span class="st">&quot;P&quot;</span>,<span class="st">&quot;Z&quot;</span>), <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(std, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAEgCAMAAABcujGyAAAAhFBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZpAAZrY6AAA6ADo6AGY6OpA6ZrY6kNtmAABmADpmAGZmOjpmOpBmZjpmZrZmkNtmtv+QOgCQOjqQOmaQtpCQ27aQ29uQ2/+2ZgC2Zjq2/7a2///bkDrb25Db////tmb/25D/27b/29v//7b//9v///98usIPAAAACXBIWXMAAA7DAAAOwwHHb6hkAAANUklEQVR4nO2d62LbxhFGIbWu5KaSnV4sp7WciDWZUnz/9ysgNo1MAiAxM7vzaXnOj9gxgBkMcAhgwV1utwMQpsveAYA5EBSkQVCQBkFBGgQFaRAUpEFQkAZBQRoEBWkQFKRBUJAGQUEaBAVpEBSkQVCQBkFBGgQFaRAUpEFQkAZBQRoEBWmyBN3eXz/tnh/6/7TJ9r7r+eNj9n4UYz3U190Vz5MnaHfTtqDvvu1+vb9q19CeVfepeI5EQa8eWxe0yhnMY3N7Uz5JoqDdDYK+ZeqcvTxBb75efWlc0F/vm61vV+vTlyjo5vZPLQvaeCOpv8EP94jiJAq6+9p1DQta5fTl8fxQpwGYKejmFkHfLKsKr5gGMgXtL6EI+kap1r5NFXRzi6BvlOeHlxf15Yvkq06QBkFBGgQFaRAUpEFQkAZBQRoEBWkQFKRBUJAGQUEaBAVpEBSkQVCQBkFBGgQFaRAUpEFQkAZBQZp5Qfc/wNP277eANLOCPj+8DM3f/PD9yJNOj9hjosfl1jdb+vbj06s/ztsmheATGBotgguu76wr6J9bFXT8Eaad+mpEi8Aq6PDTCi2fwKlHGPf+RIOgUeGSMO4RjzAimAVt/BbY/CNMjWgReJ9Bm70FNv4IUyVaBGGt+NcvBRa8KihO+gks/AYmvb5ynKovsBWfaGl6K75w3e0K2r3678wKUyy+BSYpmt6KR1AjTkEt22Qomt6KfyOC5j+MHeITdDhzq+Pf2DtRYMIBSG/FvxFBS0Tz4RZ0fWO4BVY/AumteAQ14hZ0dWe4BVa/hqafQAS10X33x8wa42zv3/37H/0ff13aiKhtKK34vGgunIIO98Crx8375SewsqG04vOiuXALat7mTQg6+0VEjR3ICY+gu9qXUFrxedFc5Ala9yhkt+JLF4uglqgBK0WRfQIR1EiioFUPQ3YrHkFtdAd/zqxiCRuxVgzZrXgEtYGg84R9F4+gNlIFrXkcslvxCGoDQU/QeitefchOsqD1DkT2FUZUUPkhO7mCVjwQjmfQ5d0J4/KXjq8+arU7+svMOpa4Qev5sZ9AU3fCqPyl46uPWkXQE1i7E0blLx5ffNQqgp7A3J0wKH9SfAT1BDdhTmTtThiVv3D8/gp60/QzqPM1hb6gQdFEBR2eQdfXT6qCdiN/m1lpBO9rCgQNwtOK3378xd/ftQh+Qb2vKRA0COsV9PNw79v+KNqKj7uCWgtE0CDsz6DDCezv8iHRovEL6n5NUetQIGheNDsBgnq3QdAYsusrQ4Cg3s4GCBpDdn1F6Eb/OrPWMe7OBggag/mLiH2rXfMZNEBQ97BcBI3BGn/7YWyKq3YE9Xc2qHQsEHSC9WFPLVe0WAIE9Xc2QNAQsusrQoSg7m0QNITs+krQTfx9ZrVx9l9HLNvGsqqH7BOIoMuJENTfCkTQELLrK0HIFXRze8cVtHb64gkaEnS3W119uSBBjb19EHQ53eT/zKw3xvPD0XTxSwqsczC4guZFMxImqHMbBI0AQe2xA9e1g6B50YwgaMVoCLocBK0YDUGXg6AVoyHoYrqZ/zt3Ucg2CBoBgjqCx61rB0HzotlA0JrR3oygOsOOZQStYyiC5kWzgaA1oyGocxcQtGw0BHXuAoKWjYagzl1A0LLRENS5CwhaNhqCOvfALGjALBHSgsbMglG+RAQdJ2SWiBqHw5gjaBYMBPXugVXQkFkihAUNmgUDQb174L2Cun5fUljQoFkwENS7A+Zn0IhZIoQFDZoFA0G9O5DZipcWNCYagnp3ILMVLy0orfgUwgSlFV8ye1qGbEGP84e14i3dtYQFpRWfQpygtOJLZk/L0I6gtOKLZi+fQXO++EBBI7ZRFjQmmqygovPFBwq67q7+eXv443YNCdp4K15zvviR9OZn0M+Pw1RQtOKLZC+fQXO++EBB+4/e809P3k9gheMRdYWxDSqTFVRzvvjIK+j+E+icT11X0ItrxSuM6hzLbm/FD1Opr52fQF1Bm2/Fb26v/nXvbENEEypoyDbCgsZEkxW0fz4bZkpy3gGDQdAFtN+KH56vpVrxow8YCDpOTCteuL79FVTqPehocgQdJ+Y9oW59w3tstWdQBF1ATCtet74q0SKSnxR0+/fdyw3BkSNsdQunUkzVF9KKF67PFq0k47lPX0HXV4/r7pMrSdTqFk6moL4l0QpiFbS/2904k0StbuF0ivH6IvoaKNdnjVYOq6Cb209H7+MXJola3cLJFOP1hfQ1EK7PGq0gRkFfXuW2/Aw6Xl8zfQ2Knr9IJlLTih+n9b4GVaJFpEbQCVrva1Aj2qLMCJoQrfX6KmTOFVT3u+qYaAjqzoygJaMhqDuzWdDGe/vERBMWVGxU52Riq6Ctj9mJiaYrqNqoznBB+eWN+skjU6iN6ix2Bb2YMTuWaDVOt/MKKjKqczqv+Rm09TE7EdGEBRUb1VlA0JhtENRLVI7UUZ02C2nFe6MpC7p5/9ifQpEe9QUEpRVfPXdojqG3Vn/uRFrxBQRt/pc3IqIJC9qfuM1fVFrxc1lpxReMJizo7ufH/iK6GySNiOajhKC04qvnjs3x/DCcv3ff3+FbEjRmGwT10sB38bNJPVfQm0v6Jqmx3+CvEi0iqecZdH39dDmCWqIhqD+nqxW//fgLglbLXSNHO4IOTcDe0B9pxVfLXSNHgqAnHpscz6DDe6b1NYJWSl0lSYag5sU1WvHljwiC5kWLSImg5aIhaEBGBC0XDUEDMiJouWgIekZCBM2LhqABCRG0XDQEDciHoOWiSQuqMewYQRMFrXOyjVk0hh2f0bcBQYtFkxZUY9jxGekQtFg0aUElhh2f0zkMQYtFkxZUYtjxOdkQdAJ/I0Jb0KM49Ycdn5UMQccJaEToC7rvkhYVbTEI6kgQ0IiQFnR7v79iOnujeTgvF4KOE9CIkBa0fwa9S76CFhY06EWvqqD+RkSlc21Ps7r6kinomamsgka96JUV1B1NXtD+HB7Nn1RP0HMzWQWNetErK6j7DqEvaPFoEZm8V1D3i97ShyStFY+gIYnMz6BRL3pFBfXfIRB0Lk95QaO2ERXUf4dA0JA82a14VUEvoBVfPlpEmuxWvKyg7mh657p6tMksFQQN+n1QXUG9dwi9m2X9aFNJgr7uoBXvuUMgaEwSWvHjuO8QCBqTg1b8OO47BILGpEDQCZx3CL033gnRRjMgaMn47QiaNKozcpqN+VZ8VH9CVUGdJ1Bd0KRRnctf85ivoNsPhz1hTm+zPIufpBOoLmjOqM7Y15Angq0PZ4g4Y5vlWdwknUB1QVNGdVqGPPEMOo73BKoLmjGq0zQkD0En8J3Aan6GZSo/qtMWHEGLRNMXNGYaoQUY5UfQItHkBQ2aRuh8rBdnBC0STV7QoGmEzsb88ICg4/je89bz03wFjZlG6Ewcz7YIOoHrPa++oEHTCJ2Hp+2FoFM43vPW/ImjN/BdvOtwIGiBaBX91BfU+WlF0ALREPT3gN67CYLGR6v6I4bagvoPBYLGR6vpp7SgEZ9UBA2PJvgrsBnRgr43TRe0eA+v6tGq+qkqaNjX+ggaHa3uBVRT0MBeJwgaHa2un4KCxvaJQtDgaJX9VBM0vMsegsZGq3yDlxK0SH9SBA2NVt1PFUGL9XZG0MBo9fUUELRwT3wEDYtWeRqs37LmRasy95dZ0LCB/6KCLquv+ixtv2euHa37P6GZJ9OZFkUO/NcU9FR93QGOPfRR7gN4WGJOqVZBw34fdPI4BHCyCmN9qUYeUOIDmGLiBN4raOp0zufgPIGt1hd3gSmM+RlUYTrnc7DuUeP1tfABrNSKL0z6a5jCXPAHEEFLR4vggutD0NLRIrjg+kyC6mE+NNQnwczO2suUX+RDpIhLrw9BY3NSX9yis5ZHJ+UExi3yIVIEgloRKeLS60PQ2JzUF7forOXRSTmBcYt8iBRRTlCACiAoSIOgIA2CgjQICtIgKEiDoCANgoI0CArSWAVdd92n4399GZ61X/T9Cs8P3TAp39ii3ddX/3gUdnU3vdX109RWfqhPpD6joNsPj4dDsYZ/ve9z7hcdrLC6GUZwjS5a3wzHZXTRMKjmbjzg/+aoGt/KD/Wp1GcUdPPDt32K1zz/NEy6t180ssLqbmpRX+D4oufPf7sbD7ivaDKXF+pTqc8oaP+x2X09viwPt4j9ouMV+mUTi1b9BX580equv0WMLlr/YZjIdyqXG+pTqa+aoMOsg5P789s/HizqP1pTBe7+8223Gt8qAupTqS/yFr8vcPyyvXn/OHNFn7h7rIbxVJM3lpl7jhvqU6kvtJH0UuDog+/+71MP2f3nZ+pxeTXxkD1stZrcyg31qdRX6TXT15fP0uQLh6l3EfOvKaa38kN9IvXxoh6kQVCQBkFBGgQFaRAUpEFQkAZBQRoEBWkQFKRBUJAGQUEaBAVpEBSkQVCQBkFBGgQFaRAUpEFQkAZBQRoEBWkQFKRBUJAGQUEaBAVpEBSkQVCQBkFBGgQFaRAUpEFQkAZBQRoEBWkQFKRBUJAGQUEaBAVpEBSkQVCQBkFBGgQFaRAUpPkvF1z90VgPki0AAAAASUVORK5CYII=" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-1d-npz-model---scenarios" class="section level2">
+<h2>The 1D NPZ model - scenarios</h2>
+<p>The river model with nutrient, phytoplankton and zooplankton dynamics is now run with different flow rates. Flow rates are varied from 1 km /day up to 10 km per day:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>parms0 <span class="ot">&lt;-</span> parms1 <span class="ot">&lt;-</span> parms2 <span class="ot">&lt;-</span> parms</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>parms0[<span class="st">&quot;v&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1000</span>  <span class="co"># m/d</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>std0 <span class="ot">&lt;-</span> <span class="fu">steady.1D</span>(<span class="at">y=</span>y_init, <span class="at">time=</span><span class="dv">0</span>, <span class="at">func=</span>riverNPZ, <span class="at">parms=</span>parms0,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">nspec=</span><span class="dv">3</span>, <span class="at">names=</span><span class="fu">c</span>(<span class="st">&quot;N&quot;</span>,<span class="st">&quot;P&quot;</span>,<span class="st">&quot;Z&quot;</span>), <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>parms1[<span class="st">&quot;v&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">5000</span>  <span class="co"># m/d</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>std1 <span class="ot">&lt;-</span> <span class="fu">steady.1D</span>(<span class="at">y=</span>y_init, <span class="at">time=</span><span class="dv">0</span>, <span class="at">func=</span>riverNPZ, <span class="at">parms=</span>parms1,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">nspec=</span><span class="dv">3</span>, <span class="at">names=</span><span class="fu">c</span>(<span class="st">&quot;N&quot;</span>,<span class="st">&quot;P&quot;</span>,<span class="st">&quot;Z&quot;</span>), <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>parms2[<span class="st">&quot;v&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">10000</span> <span class="co"># m/d</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>std2 <span class="ot">&lt;-</span> <span class="fu">steady.1D</span>(<span class="at">y=</span>y_init, <span class="at">time=</span><span class="dv">0</span>, <span class="at">func=</span>riverNPZ, <span class="at">parms=</span>parms2,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">nspec=</span><span class="dv">3</span>, <span class="at">names=</span><span class="fu">c</span>(<span class="st">&quot;N&quot;</span>,<span class="st">&quot;P&quot;</span>,<span class="st">&quot;Z&quot;</span>), <span class="at">method=</span><span class="st">&quot;runsteady&quot;</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(std0, std1, std2, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">1</span>), <span class="at">grid=</span>Grid<span class="sc">$</span>x.mid<span class="sc">/</span><span class="dv">1000</span>, </span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">lty=</span><span class="dv">1</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">xlab=</span><span class="st">&quot;km&quot;</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;top&quot;</span>, <span class="at">title=</span><span class="st">&quot;v=&quot;</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="st">&quot;1km/d&quot;</span>,<span class="st">&quot;5km/d&quot;</span>,<span class="st">&quot;10km/d&quot;</span>), </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">lty=</span><span class="dv">1</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="outlook" class="section level2">
+<h2>Outlook</h2>
+<p>The 1D-NPZ model shows how straightforward transport can be implemented. We used the “method of lines” where space is discretized in fixed steps while time is solved with standard solvers in variable time steps. This works for many problems, even in 2D and 3D <span class="citation">(cf. K. Soetaert and Herman 2009; Karline Soetaert, Cash, and Mazzia 2012)</span>, but there are of course also specialized cases where other methods are preferred.</p>
+<p>The model described here can be seen as a starting point for more complex applications, e.g. with seasonal (or diurnal) forcing, variable river geometry, vertical exchange in the weater column of lakes or in the sediment and of course also for completely different problems in other fields.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Soetaert2012" class="csl-entry">
+Soetaert, Karline, Jeff Cash, and Francesca Mazzia. 2012. <em>Solving Differential Equations in <span>R</span></em>. <span>Springer Verlag</span>.
+</div>
+<div id="ref-Soetaert2008" class="csl-entry">
+Soetaert, K, and P M J Herman. 2009. <em>A Practical Guide to Ecological Modelling. Using <span>R</span> as a Simulation Platform</em>. Springer.
+</div>
+<div id="ref-Soetaert2012ReacTran" class="csl-entry">
+Soetaert, K, and F Meysman. 2012. <span>“Reactive Transport in Aquatic Ecosystems: Rapid Model Prototyping in the Open Source Software r.”</span> <em>Environmental Modelling &amp; Software</em> 32: 49–60.
+</div>
+</div>
+<hr />
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
