@@ -1,5 +1,5 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align="center")
 #library(learnr)
 library(deSolve)
 library(rootSolve)
@@ -25,13 +25,13 @@ parms <- c(
   N0      = 5      # phosphorus in inflow (mmol/m3)
 )
 
-## ---- single, fig.height=3, fig.width=8---------------------------------------
+## ---- single, fig.height=3, fig.width=7---------------------------------------
 times <- seq(from=0, to=40, length.out=100)  # simulation time (d)
 y     <- c(N = 5, P = 1)                     # Nutrient (mmolP/m3) and Phytoplankton (mmolC/m3)
 out   <- ode(y, times, chemostat, parms)
 plot(out, mfrow=c(1, 3))
 
-## ---- chemostat-ex1, eval=FALSE, fig.height=3, fig.width=8--------------------
+## ---- chemostat-ex1, eval=FALSE, fig.height=3, fig.width=7--------------------
 #  library("deSolve")
 #  library("rootSolve")
 #  
@@ -74,7 +74,7 @@ plot(out, mfrow=c(1, 3))
 #    allow_retry = TRUE
 #  )
 
-## ---- chemostat-ex2, eval=TRUE, fig.height=3, fig.width=8---------------------
+## ---- chemostat-ex2, eval=TRUE, fig.height=3, fig.width=7---------------------
 library("deSolve")
 library("rootSolve")
 
@@ -116,7 +116,7 @@ plot(out, mfrow=c(1, 3))
 #    allow_retry = TRUE
 #  )
 
-## ---- multiple, fig.height=4, fig.width=8-------------------------------------
+## ---- multiple, fig.height=4, fig.width=7-------------------------------------
 times <- seq(from=0, to=40, length.out=100)  # simulation time (d)
 y     <- c(N=5, P=1)
 p1 <- p2 <- p3 <- parms
@@ -128,13 +128,12 @@ out3 <- ode(y, times, chemostat, p3)
 
 plot(out, out1, out2, out3, which=c("N", "P"))
 
-## ----analytical, fig.height=3, fig.width=8------------------------------------
+## ----analytical, fig.height=3, fig.width=7------------------------------------
 d <- seq(0, 0.6, length.out = 100)
 r <- 0.5;  kp <- 0.5; Y = 106; N0 = 5
  
 N <- d * kp / (r - d)
 N <- ifelse(d > (r * N0)/(kp + N0), N0, N)
- 
 P <- Y * (N0 - N)
  
 par(mfrow=c(1, 3))
@@ -142,7 +141,7 @@ plot(d, N,     type="l")
 plot(d, P,     type="l")
 plot(d, d * P, type="l")
 
-## ---- steadystate, eval=FALSE, fig.height=3, fig.width=8----------------------
+## ---- steadystate, eval=FALSE, fig.height=3, fig.width=7----------------------
 #  state <- data.frame(
 #    d = seq(0.01, 0.5, length.out = 100),
 #    N = 0,
@@ -166,7 +165,7 @@ plot(d, d * P, type="l")
 #  #plot(P     ~ d, data = state, type = "l")
 #  #plot(N * P ~ d, data = state, type = "l")
 
-## ---- steadystate-hint, eval=FALSE, fig.height=3, fig.width=8-----------------
+## ---- steadystate-hint, eval=FALSE, fig.height=3, fig.width=7-----------------
 #  for (i in 1:nrow(state)) {
 #    parms["d"] <- state$d[i]
 #    times <- c(0, Inf)

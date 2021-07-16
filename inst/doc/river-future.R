@@ -1,5 +1,5 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center")
 library("ReacTran")
 library("future")
 library("gifski")
@@ -60,7 +60,7 @@ P_init  <- rep(100, times=nbox) # mmolC/m3
 Z_init  <- rep(10,  times=nbox) # mmolC/m3
 y_init  <- c(N_init, P_init, Z_init)
 
-## ----river-npz-future, fig.height=8, fig.width=8------------------------------
+## ----river-npz-future, fig.height=8, fig.width=7------------------------------
 library("future")
 
 parms1 <- parms2 <- parms
@@ -88,11 +88,11 @@ system.time({
   dynamic  %<-% ode.1D(y=y_init, times=time_seq, func=riverNPZ, parms=parms, nspec=3)
 })
 
-## ----river-npz-image, fig.height=8, fig.width=8-------------------------------
+## ----river-npz-image, fig.height=8, fig.width=7-------------------------------
 image(dynamic, xlab = "time, days", ylab = "Distance, m", grid= Grid$x.mid,
       main =c("PO4","Phyto","Zoo"), add.contour=TRUE, mfrow = c(3, 1)) 
 
-## ----river-npz-ani, fig.height=8, fig.width=8---------------------------------
+## ----river-npz-ani, fig.height=8, fig.width=7---------------------------------
 plot_poly <- function(data, time) {
   poly <- function(x, y, pcol, ylab, ylim) {
     plot(x, y, type="n", las=1, xlab="", ylab="", ylim=ylim)

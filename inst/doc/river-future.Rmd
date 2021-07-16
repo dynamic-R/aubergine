@@ -2,7 +2,7 @@
 title: "Parallelisation with 'future' and Animations"
 author: "Thomas Petzoldt and Karline Soetaert"
 date: "July 2021"
-bibliography: bib.bib
+bibliography: aubergine.bib
 output: 
   rmarkdown::html_vignette:
     toc: true
@@ -14,7 +14,7 @@ vignette: >
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center")
 library("ReacTran")
 library("future")
 library("gifski")
@@ -29,20 +29,33 @@ library("gifski")
 
 ## A Goody at the End: Easy Parallel Execution with `future`
 
-We have seen that computation of 1D models can take a while, and if we go through the script line by
-line, we may consider to wait before we enter the next part. Here we can ask: Why not running the simulation in the background or Why not running the three scenarios in parallel on our multiprocessor machine? 
+We have seen that computation of 1D models was surprisingly fast due
+to vectorization, but we may wish to have it even faster. If we go
+through the script line by line, we need to wait before we enter the
+next part. Here we can ask: Why not running the simulation in the
+background, or why not running the three scenarios and another
+additional dynamic simulation in parallel on our multiprocessor
+machine?
 
-This is indeed possible and R has different mechanisms for this, one intriguingly 
-simple is provided by package **future** [@Bengtsson2020]. In the following, we 
-just use the `%<-%` operator instead of the common `<-`.
+This is indeed possible and R has different mechanisms for this, one
+intriguingly simple is provided by package **future**
+[@Bengtsson2020]. In the following, we just use the `%<-%` operator
+instead of the common `<-`.
 
-Before that, we set a `plan` that **R** should run this in multiple sessions.
+Before that, we set a `plan` that **R** should run this in multiple
+sessions.
 
-How does it work? After entering sich a code segment, R gives control back to the user,
-and starts simulation in a separate R worker process in the background.
-This can then be done for all three scenarios one after each other, because its results (`std0` ... `std2`) are not yet needed for the next step. They are eventually needed "in the future" for the `plot` function, so R does not need to return the results immediately.
+How does it work? After entering sich a code segment, R gives control
+back to the user, and starts simulation in a separate R worker process
+in the background.  This can then be done for all three scenarios one
+after each other, because its results (`std0` ... `std2`) are not yet
+needed for the next step. They are eventually needed "in the future"
+for the `plot` function, so R does not need to return the results
+immediately.
 
-The following code is again a simple 1D river model, solved with packages **deSolve** [@Soetaert2010a] and **ReacTran** [@Soetaert2012ReacTran].
+The following code is again a simple 1D river model, solved with
+packages **deSolve** [@Soetaert2010a] and **ReacTran**
+[@Soetaert2012ReacTran].
 
 ### The model
 
@@ -105,7 +118,7 @@ y_init  <- c(N_init, P_init, Z_init)
 
 ### Parallelization
 
-```{r river-npz-future, fig.height=8, fig.width=8}
+```{r river-npz-future, fig.height=8, fig.width=7}
 library("future")
 
 parms1 <- parms2 <- parms
@@ -134,50 +147,60 @@ system.time({
 })
 ```
 
-The normal sequential version took 15s and the multisession version 6.5s on my PC with 4 (i5 with 4 cores).
+The normal sequential version took 15s and the multisession version
+6.3s on my PC with 4 (i5 with 4 cores).
 
-Instead of parallelization, or in addition to it, it is also possible to make the model itself faster.
-Typical means are vectorization (that is already the case for the river model), and
-compiled code. Here the model is written in C or Fortran and then linked to R.
-Depending on the type of the model and how good it can be vectorized, simulations
-can then be 2 to 200 times faster, in particular if the model cannot be written
-in matrix notation. The C or Fortran code can be written by hand or created
-from a code generator. Here, manual programming is not that difficult, because
-only the numerical parts need to be encoded. More about this can be found in the
-[package vignettte](https://cran.r-project.org/web/packages/deSolve/vignettes/compiledCode.pdf)
-of **deSolve** and in a 
-[small tutorial](https://tpetzoldt.github.io/deSolve-compiled/deSolve-compiled.html) on Github.
+Instead of parallelization, or in addition to it, it is also possible
+to make the model itself faster.  Typical means are vectorization
+(that is already the case for the river model), and compiled
+code. Here the model is written in C or Fortran and then linked to R.
+Depending on the type of the model and how good it can be vectorized,
+simulations can then be 2 to 200 times faster, in particular if the
+model cannot be written in matrix notation. The C or Fortran code can
+be written by hand or created from a code generator. Here, manual
+programming is not that difficult, because only the numerical parts
+need to be encoded. More about this can be found in the [package
+vignettte](https://cran.r-project.org/web/packages/deSolve/vignettes/compiledCode.pdf)
+of **deSolve** and in a [small
+tutorial](https://tpetzoldt.github.io/deSolve-compiled/deSolve-compiled.html)
+on Github.
 
-The C or Fortran code can also be created with a code generator, e.g. **cOde** [@Kaschek2019] or
-**odin** [@Fritzjohn2021]. Furthermore, package **rodeo** [@Kneis2017,@Kneis2021] can 
-generate **deSolve** compatible Fortran code directly from a tabular description 
-(stoichiometry table or Petersen-Gujer-matrix) of the model. It is also able to
-generate code for 1D models.
+The C or Fortran code can also be created with a code generator,
+e.g. **cOde** [@Kaschek2019] or **odin**
+[@Fritzjohn2021]. Furthermore, package **rodeo**
+[@Kneis2017,@Kneis2021] can generate **deSolve** compatible Fortran
+code directly from a tabular description (stoichiometry table or
+Petersen-Gujer-matrix) of the model. It is also able to generate code
+for 1D models.
 
 ## Visualization of multi-dimensional model results
 
-Dynamic models are multi-dimensional. Let's say we have a 1D model as follows, we
-have 3 dimensions (time, space, value) for each state variable. In such cases it makes
-sense to use volor image graphics (also called [Hovmöller diagrams](https://en.wikipedia.org/wiki/Hovm%C3%B6ller_diagram))
-or animations. 
+Dynamic models are multi-dimensional. Let's say we have a 1D model as
+follows, we have 3 dimensions (time, space, value) for each state
+variable. In such cases it makes sense to use volor image graphics
+(also called [Hovmöller
+diagrams](https://en.wikipedia.org/wiki/Hovm%C3%B6ller_diagram)) or
+animations.
 
 ### Color image diagram
 
-Color image diagrams can be created with **R**'s `image` function. Some more options
-are available in packages **plot3D** [@plot3D] and **OceanView** [@OceanView].
+Color image diagrams can be created with **R**'s `image`
+function. Some more options are available in packages **plot3D**
+[@plot3D] and **OceanView** [@OceanView].
 
-```{r river-npz-image, fig.height=8, fig.width=8}
+```{r river-npz-image, fig.height=8, fig.width=7}
 image(dynamic, xlab = "time, days", ylab = "Distance, m", grid= Grid$x.mid,
       main =c("PO4","Phyto","Zoo"), add.contour=TRUE, mfrow = c(3, 1)) 
 ```
 
 ### Animated graphics
 
-Here we want to create an animated figure. To make it well readable, we use 
-filled polygons. First, a loop creates png images for each time step of the simulation
-and then **gifski** [@Ooms2021] puts this together and creates a gif-file.
+Here we want to create an animated figure. To make it well readable,
+we use filled polygons. First, a loop creates png images for each time
+step of the simulation and then **gifski** [@Ooms2021] puts this
+together and creates a gif-file.
 
-```{r river-npz-ani, fig.height=8, fig.width=8}
+```{r river-npz-ani, fig.height=8, fig.width=7}
 plot_poly <- function(data, time) {
   poly <- function(x, y, pcol, ylab, ylim) {
     plot(x, y, type="n", las=1, xlab="", ylab="", ylim=ylim)
@@ -213,7 +236,8 @@ gifski(dir(pattern="^river.*png$"), gif_file = "river.gif", width=800, height=60
 
 ## Finally
 
-Finally, we close the **future** workers and reset the strategy back to sequential.
+Finally, we close the **future** workers and reset the strategy back
+to sequential.
 
 
 ```{r close-workers}

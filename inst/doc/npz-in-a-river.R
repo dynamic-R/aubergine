@@ -1,0 +1,224 @@
+## ----setup, include=FALSE-----------------------------------------------------
+knitr::opts_chunk$set(echo = TRUE, fig.align="center")
+library("ReacTran")
+library("rootSolve")
+
+## ---- chemostatNP-------------------------------------------------------------
+library (deSolve)
+chemostatNP <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+    p_growth <- r_pgrow * N / (k_n + N) * P
+    
+  # mass balance = process rates   + transport
+    dN_dt   <-  - c_pn * p_growth + d*(N0-N)
+    dP_dt   <-           p_growth + d*(0 -P)
+    list(c(dN_dt, dP_dt))
+   })
+}
+parms<- c(r_pgrow=0.5, k_n=1.0, c_pn=1/106, d=0.1, N0=5)
+y    <- c(N = 5, P = 1)  
+std  <- steady(y, times=c(0,Inf), func=chemostatNP, parms=parms,
+                method="runsteady") # solve model
+std$y
+
+## ----river-np, fig.height=4, fig.width=7--------------------------------------
+library(ReacTran)                                               ## CHANGED ##
+
+riverNP <- function(time, y, parms) {
+  with(as.list(parms), {    # was:  as.list(c(y, parms))        ## CHANGED ##
+   # state vectors need to be extracted from y                  ## NEW ##
+    N <- y[        1 :(1*nbox)]   
+    P <- y[(1*nbox+1):(2*nbox)]   
+
+    p_growth  <- r_pgrow * N / (k_n + N) * P
+
+   # transport: C.up=upstream conc, v=flow velocity             ## NEW ##
+    n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)  
+    p_transport <- tran.1D(C=P, C.up=P0, v=v, dx=Grid)
+
+   # mass balance = process rates + transport
+    dN_dt <- c_pn * (-p_growth)  + n_transport$dC               ## CHANGED ##
+    dP_dt <-          p_growth   + p_transport$dC
+
+    list(c(dN_dt, dP_dt))
+  })
+}
+parms <- c(
+  r_pgrow = 0.5,   # phytoplankton growth parameter (1/d)
+  k_n     = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
+  k_p     = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
+  c_pn    = 1/106, # conversion from phosporus to phyto (P:C)
+  v       = 10000, # flow velocity (m/d)                        ## NEW ##
+  N0      = 500,   # nutrient (PO4) in inflow (mmolP/m3)    
+  P0      = 10     # algae in inflow (mmolC/m3)
+)
+
+# morphology: divide the river into 500 boxes                   ## NEW ##
+Length <- 500e3  # length of the river (m)
+nbox   <- 500    # number of 1D grid cells
+Grid   <- setup.grid.1D(L = Length, N = nbox)
+
+# Phyto as C and Phosphorus P (mol/m3) - each nbox long         ## CHANGED ##
+N_init  <- rep(5, times=nbox)  # mmolP/m3
+P_init  <- rep(1, times=nbox) # mmolC/m3
+y_init  <- c(N_init, P_init)
+
+std <- steady.1D(y_init, times=c(0,Inf), func=riverNP, parms=parms,
+                 nspec=2, names=c("N","P"),                     ## NEW ##
+                 method="runsteady")
+plot(std, mfrow=c(1,2), grid=Grid$x.mid/1000,                   ## CHANGED ## 
+     lty=1, lwd=2, xlab="km")
+
+## ---- chemostatNPZ------------------------------------------------------------
+library (deSolve)
+chemostatNPZ <- function(time, y, parms) {
+  with(as.list(c(y, parms)), {
+    p_growth  <- r_pgrow * N / (k_n + N) * P
+    z_grazing <- r_zgraz * P / (k_p + P) * Z
+    z_loss    <- r_zloss * Z
+  # mass balance = process rates   + transport
+    dN_dt <- c_pn*(-p_growth + (1 - asseff) * z_grazing + z_loss) + d * (N0 - N)
+    dP_dt <-        p_growth -                z_grazing           + d * (0 - P)
+    dZ_dt <-                        asseff  * z_grazing - z_loss  + d * (0 - Z)
+    list(c(dN_dt, dP_dt, dZ_dt))
+   })
+}
+parms<- c(r_pgrow=0.5, r_zgraz=0.4, r_zloss=0.01, k_n=0.5, 
+          k_p=100, c_pn=1/106, asseff=0.3, d=0.11, N0=500)
+y   <- c(N=5, P=1, Z=1)  
+std <- steady(y, times=c(0,Inf), func=chemostatNPZ, parms=parms, method="runsteady") 
+
+## ----riverNPZ, eval=FALSE, fig.height=4, fig.width=7--------------------------
+#  library(ReacTran)
+#  
+#  riverNPZ <- function(time, y, parms) {
+#    with(as.list(parms), {
+#     # state vectors need to be extracted from y
+#      N <- y[        1 :(1*nbox)]
+#      P <- y[(1*nbox+1):(2*nbox)]
+#      Z <- ..                                                     ## CHANGE ##
+#  
+#      p_growth  <- r_pgrow * N / (k_n + N) * P
+#      z_grazing <- ...                                            ## ADD ##
+#      z_loss    <- ...                                            ## ADD ##
+#  
+#     # transport: C.up=upstream conc, v=flow velocity
+#      n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)
+#      p_transport <- tran.1D(C=P, C.up=P0, v=v, dx=Grid)
+#      z_transport <- ..                                           ## ADD ##
+#  
+#     # mass balance = process rates + transport
+#      dN_dt <- c_pn * (-p_growth)  + n_transport$dC               ## CHANGE ##
+#      dP_dt <-          p_growth   + p_transport$dC               ## CHANGE ##
+#      dZ_dt <- ..                                                 ## ADD ##
+#  
+#      list(c(dN_dt, dP_dt, ..))                                   ## CHANGE ##
+#    })
+#  }
+#  parms <- c(
+#    r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+#    r_zgraz  = 0.4,   # zooplankton ingestion parameter (1/d)
+#    r_zloss  = 0.01,  # zooplankton loss parameter (1/d)
+#  
+#    k_n      = 0.5,   # Monod ct of phyto growth on nutrient (mmol/m3)
+#    k_p      = 100,   # Monod ct of zoo grazing on phyto (mmol/m3)
+#    c_pn     = 1/106, # conversion from phosporus P to phyto C (P:C)
+#    asseff   = 0.3,   # assimilation efficiency of zoo (-)
+#  
+#    v        = 10000, # flow velocity (m/d)
+#    N0       = 500,   # nutrient (PO4) in inflow (mmolP/m3)
+#    P0       = 10,    # algae in inflow (mmolC/m3)
+#    Z0       = 1      # zooplankton in inflow (mmolC/m3)
+#  )
+#  
+#  # river morphology
+#  Length <- 500e3  # length of the river (m)
+#  nbox   <- 500    # number of 1D grid cells
+#  Grid   <- setup.grid.1D(L = Length, N = nbox)
+#  
+#  # Zoo and Phyto as C and Phosphorus P (mol/m3)
+#  N_init  <- rep(500, times=nbox) # mmolP/m3
+#  P_init  <- rep(100, times=nbox) # mmolC/m3
+#  Z_init  <- ..                                                   ## ADD ##
+#  y_init  <- c(N_init, P_init, ..)                                ## ADD ##
+#  
+#  std <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
+#                   nspec=2, names=c("N","P"),                     ## CHANGE ##
+#                   method="runsteady")
+#  plot(std, mfrow=c(1,3), grid=Grid$x.mid/1000, xlab="km")
+
+## ----riverNPZ-solution, include=FALSE, fig.height=3, fig.width=7--------------
+library(ReacTran)
+
+riverNPZ <- function(time, y, parms) {
+  with(as.list(parms), {
+    N <- y[       1  :   nbox ]
+    P <- y[(  nbox+1):(2*nbox)]
+    Z <- y[(2*nbox+1):(3*nbox)]                            ## ADDED ##
+
+    p_growth  <- r_pgrow * N / (k_n + N) * P
+    z_grazing <- r_zgraz * P / (k_p + P) * Z               ## ADDED ##
+    z_loss    <- r_zloss * Z                               ## ADDED ##   
+
+    n_transport <- tran.1D(C=N, C.up=N0, v=v, dx=Grid)
+    p_transport <- tran.1D(C=P, C.up=P0, v=v, dx=Grid)
+    z_transport <- tran.1D(C=Z, C.up=Z0, v=v, dx=Grid)     ## ADDED ##
+
+    dN_dt <- c_pn*(-p_growth + (1-asseff)*z_grazing + z_loss) + n_transport$dC
+    dP_dt <-        p_growth -            z_grazing           + p_transport$dC
+    dZ_dt <-                 +    asseff *z_grazing - z_loss  + z_transport$dC
+
+    list(c(dN_dt, dP_dt, dZ_dt))
+  })
+}
+parms <- c(
+  r_pgrow  = 0.5,   # phytoplankton growth parameter (1/d)
+  r_zgraz  = 0.4,   # zooplankton ingestion parameter (1/d)
+  r_zloss  = 0.01,  # zooplankton loss parameter (1/d)
+
+  k_n      = 0.5,   # Monod constant of phyto growth on nutrient (mmol/m3)
+  k_p      = 100,   # Monod constant of zoo grazing on phyto (mmol/m3)
+  c_pn     = 1/106, # stoichiometric conversion from phosporus P to phyto C (P:C)
+  asseff   = 0.3,   # assimilation efficiency of zoo (-)
+
+  v        = 10000, # flow velocity (m/d)
+  N0       = 500,   # nutrient (PO4) in inflow (mmolP/m3)
+  P0       = 10,    # algae in inflow (mmolC/m3)
+  Z0       = 1      # zooplankton in inflow (mmolC/m3)
+)
+
+# river morphology
+Length <- 500e3  # length of the river (m)
+nbox   <- 500    # number of 1D grid cells
+Grid   <- setup.grid.1D(L = Length, N = nbox)
+
+# Zoo and Phyto as C and Phosphorus P (mol/m3)
+N_init  <- rep(500, times=nbox) # mmolP/m3
+P_init  <- rep(100, times=nbox) # mmolC/m3
+Z_init  <- rep(10,  times=nbox) # mmolC/m3
+y_init  <- c(N_init, P_init, Z_init)
+
+## ----riverNPZ-solution-plot, fig.height=3, fig.width=7------------------------
+std <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
+                 nspec=3, names=c("N","P","Z"), method="runsteady")
+plot(std, mfrow=c(1,3))
+
+## ----riverNPZscenario, fig.height=8, fig.width=7------------------------------
+parms0 <- parms1 <- parms2 <- parms
+parms0["v"] <- 1000  # m/d
+std0 <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms0,
+                  nspec=3, names=c("N","P","Z"), method="runsteady")
+
+parms1["v"] <- 5000  # m/d
+std1 <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms1,
+                  nspec=3, names=c("N","P","Z"), method="runsteady")
+
+parms2["v"] <- 10000 # m/d
+std2 <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms2,
+                  nspec=3, names=c("N","P","Z"), method="runsteady")
+
+plot(std0, std1, std2, mfrow=c(3,1), grid=Grid$x.mid/1000, 
+     lty=1, lwd=2, xlab="km")
+legend("top", title="v=", legend=c("1km/d","5km/d","10km/d"), 
+       col=1:3, lty=1)
+
