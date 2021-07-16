@@ -41,16 +41,18 @@ detritus. Please don't get confused! Here **P** is phytoplankton and
 not phosphorus, while the symbol for the nutrient **N** does not
 necessarily mean that it is nitrogen.
 
-The equations governing the dynamics of **P** and **N** are:
+The equations governing the dynamics of **N** and **P** are:
 $$
-\frac{dN}{dt}=-r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(N_0-N)
+\frac{dN}{dt}=-c_{pn} \cdot r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(N_0-N)
 $$
 $$
 \frac{dP}{dt}=r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(0-P)
 $$
 
-where d is the dilution rate, and the nutrient and phytoplankton
+where $d$ is the dilution rate, and the nutrient and phytoplankton
 concentration in the inflowing water is $N_0$ and $0$ respectively.
+
+$c_{pn}$ is the stoichiometric conversion factor to go from nutrient P (phosphorus) to phytoplankton C (i.e. the molar P:C ratio).
 
 ## Implementation
 
