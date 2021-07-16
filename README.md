@@ -25,7 +25,7 @@ will not throw an error:
 ```
 install.packages("devtools") # if it is not yet installed
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
-devtools::install_github("dynamic-R/aubergine", depend=TRUE)
+devtools::install_github("dynamic-R/aubergine", ref="main", depend=TRUE)
 ```
 
 ## Start of a Tutorial
