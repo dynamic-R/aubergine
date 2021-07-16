@@ -1,12 +1,12 @@
 ---
-title: "Modelling in R: A Chemostat"
+title: "02. Modelling in R: A Chemostat"
 author: "Thomas Petzoldt and Karline Soetaert"
 description: "Tutorial: Equilibrium in a Chemostat"
 date: "July-2021"
 bibliography: aubergine.bib
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Modelling in R: A Chemostat}
+  %\VignetteIndexEntry{02. Modelling in R: A Chemostat}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

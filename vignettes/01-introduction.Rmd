@@ -1,0 +1,61 @@
+---
+title: "01. Modelling in R: Introduction"
+author: "Karline Soetaert and Thomas Petzoldt"
+date: "July-2021"
+bibliography: aubergine.bib
+csl: limnology-and-oceanography.csl
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{01. Modelling in R: Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8} 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#library(learnr)
+```
+
+## Tutorial
+
+This tutorial was developed as didactic resource for the
+\href{https://aquaticdatasciopensci.github.io/}{AEMON-J} workshop 
+in 2021. We aim to develop this package further after the workshop, so your 
+feedback is welcome.
+
+We recommend to 
+
+* watch the introductory video first: https://youtu.be/L_zL_D1Qmjc
+
+* If you prefer reading, you can find the slides under [this
+link](https://dynamic-r.github.io/hacking-limnology/).
+
+Then you can go through the tutorials. They are included in two versions:
+
+* Intereactive tutorials using the **learnr** package. They can be run in RStudio
+  or placed on a "shiny" server.
+* Static versions of the tutorials as package vignettes. The tutorials can
+  be read with any R Gui (including but not limited to RStudio) and also read
+  online with a web browser. Direct access to RMarkdown and R source code is 
+  provided in the help index of the package.
+  
+## The name of the package
+
+We tried to find a package name and had lots of fun with different ideas. Then
+we considered to call it after a vegetable and choose "aubergine". It had no
+special reason, but we can of course give a post-hoc explanation:
+
+An aubergine (*Solanum melongena**), also called "eggplant" is a very atractive 
+fruit. It is not edible in raw form, 
+" but it becomes tender when cooked and develops a rich, complex flavor. Rinsing, draining, and salting the sliced fruit before cooking may remove the bitterness.[37] The fruit is capable of absorbing cooking fats and sauces, which may enhance the flavor of eggplant dishes." [@wikipedia_eggplant, @bbc_eggplant]
+
+![](logo.jpg){width=20%}
+
+## References
+
+<div id="refs"></div>
+
+----
+

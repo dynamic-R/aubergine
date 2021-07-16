@@ -1,5 +1,5 @@
 ---
-title: "Parallelisation with 'future' and Animations"
+title: "06. Parallelisation with 'future' and Animations"
 author: "Thomas Petzoldt and Karline Soetaert"
 date: "July 2021"
 bibliography: aubergine.bib
@@ -7,7 +7,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Parallelisation with 'future' and Animations}
+  %\VignetteIndexEntry{06. Parallelisation with 'future' and Animations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8} 
 ---

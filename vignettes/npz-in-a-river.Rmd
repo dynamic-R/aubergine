@@ -1,5 +1,5 @@
 ---
-title: "1D NPZ Model in a River"
+title: "04. 1D NPZ Model in a River"
 author: "Karline Soetaert and Thomas Petzoldt"
 description: "This tutorial explains elements of a 1D Model in a River."
 date: "July-2021"
@@ -8,7 +8,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{1D NPZ Model in a River}
+  %\VignetteIndexEntry{04. 1D NPZ Model in a River}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8} 
 ---
