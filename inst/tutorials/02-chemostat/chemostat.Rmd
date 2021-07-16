@@ -52,7 +52,7 @@ $$
 where $d$ is the dilution rate, and the nutrient and phytoplankton
 concentration in the inflowing water is $N_0$ and $0$ respectively.
 
-$c_{pn}$ is the stoichiometric conversion factor to go from nutrient P (phosphorus) to phytoplankton C (i.e. the molar P:C ratio).
+The constant $c_{pn}$ is the stoichiometric conversion factor to go from nutrient N (phosphorus) to phytoplankton C (i.e. the molar P:C ratio). It is here used in inverse form, therefore $c_pn$.
 
 ## Implementation
 
@@ -261,6 +261,7 @@ out$y
 ```
 
 
+
 ```{r, steadystate-hint, fig.height=3, fig.width=8}
 for (i in 1:nrow(state)) {
   parms["d"] <- state$d[i]
@@ -281,9 +282,10 @@ advanced **R** user.
 
 ## Outlook
 
-The model shown here shows some essential properties of a flow-through system,
-used in biotechnology, wastewater treatment plants, or reservoirs and lakes. The
-following tutorials will build up on this and extend the idea further.
+The model shown here shows some essential properties of a flow-through
+system, used in biotechnology, wastewater treatment plants, or
+reservoirs and lakes. The following tutorials will build up on this
+and extend the idea further.
 
 ### References
 

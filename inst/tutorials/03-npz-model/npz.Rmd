@@ -79,7 +79,7 @@ the behavior of this more complex model.
 Following the equations of $P$ and $N$ of the chemostat:
 
 \begin{align}
-\frac{dN}{dt} &= -r \cdot \frac{N}{k_n+N}\cdot P + d \cdot (N_0-N) \\
+\frac{dN}{dt} &= - -c_{pn} \cdot r \cdot \frac{N}{k_n+N}\cdot P + d \cdot (N_0-N) \\
 \frac{dP}{dt} &=  r \cdot \frac{N}{k_n+N}\cdot P + d \cdot (0-P)
 \end{align}
 
