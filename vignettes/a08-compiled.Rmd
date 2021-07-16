@@ -1,5 +1,5 @@
 ---
-title: 'deSolve: Use of Compiled Code'
+title: '08. Use of Compiled Code'
 author: "Thomas Petzoldt and Karline Soetaert"
 date: "`r Sys.Date()`"
 bibliography: aubergine.bib
@@ -7,7 +7,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{deSolve: Use of Compiled Code}
+  %\VignetteIndexEntry{08. Use of Compiled Code}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8} 
 ---

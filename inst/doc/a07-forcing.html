@@ -14,7 +14,7 @@
 
 <meta name="date" content="2021-07-16" />
 
-<title>Forcing Functions and Events</title>
+<title>07. Forcing Functions and Events</title>
 
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
@@ -161,7 +161,7 @@ div.csl-indent {
 
 
 
-<h1 class="title toc-ignore">Forcing Functions and Events</h1>
+<h1 class="title toc-ignore">07. Forcing Functions and Events</h1>
 <h4 class="author">Karline Soetaert and Thomas Petzoldt</h4>
 <h4 class="date">2021-07-16</h4>
 
@@ -195,7 +195,7 @@ div.csl-indent {
 <p>A solver does not have large problems with first two types of discontinuities, but changing the values of state variables is much more difficult.</p>
 <p>External variables of the first type are also called “inputs” or forcing functions and <code>?forcings</code> opens the corresponding <strong>deSolve</strong> help page.</p>
 <p><strong>Why external variables?</strong></p>
-<p>Some important phenomena are not explicitly included in a differential equation model, but imposed as a time series. (e.g. sunlight, important for plant growth is rarely “modeled”). Somehow, during the integration, the model needs to know the value of the external variable at each time step.</p>
+<p>Some important phenomena are not explicitly included in a differential equation model, but imposed as a time series. (e.g. sunlight, important for plant growth is rarely “modeled”). Somehow, during the integration, the model needs to know the value of the external variable at each time step.</p>
 <p><strong>Implementation of forcing functions in R</strong></p>
 <p>R has an ingenious function that is especially suited for this task: function <code>approxfun</code>. This function is typically used in two steps. First an interpolating function is constructed. Here <code>approxfun</code> is a function that returns another function, in our case <code>afun</code> that contains both, the interpolation algorithm and the data. This is done before solving the differential equation model.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>afun <span class="ot">&lt;-</span> <span class="fu">approxfun</span>(data)</span></code></pre></div>

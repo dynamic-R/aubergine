@@ -1,5 +1,5 @@
 ---
-title: "Forcing Functions and Events"
+title: "07. Forcing Functions and Events"
 author: "Karline Soetaert and Thomas Petzoldt"
 date: "`r Sys.Date()`"
 bibliography: aubergine.bib
@@ -7,7 +7,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Forcing Functions and Events}
+  %\VignetteIndexEntry{07. Forcing Functions and Events}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8} 
 ---

@@ -1,12 +1,12 @@
 ---
-title: "Modelling in R: A Chemostat"
+title: "02. Modelling in R: A Chemostat"
 author: "Thomas Petzoldt and Karline Soetaert"
 description: "Tutorial: Equilibrium in a Chemostat"
 date: "July-2021"
 bibliography: aubergine.bib
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Modelling in R: A Chemostat}
+  %\VignetteIndexEntry{02. Modelling in R: A Chemostat}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -43,15 +43,16 @@ necessarily mean that it is nitrogen.
 
 The equations governing the dynamics of **P** and **N** are:
 $$
-\frac{dN}{dt}=-r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(N_0-N)
+\frac{dN}{dt}=-c_{pn} \cdot r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(N_0-N)
 $$
 $$
 \frac{dP}{dt}=r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(0-P)
 $$
 
-where d is the dilution rate, and the nutrient and phytoplankton
+where $d$ is the dilution rate, and the nutrient and phytoplankton
 concentration in the inflowing water is $N_0$ and $0$ respectively.
 
+The constant $c_{pn}$ is the stoichiometric conversion factor to go from nutrient N (phosphorus) to phytoplankton C (i.e. the molar P:C ratio). It is here used in inverse form, therefore $c_pn$.
 ## Implementation
 
 The system of differential equations is solved numerically with

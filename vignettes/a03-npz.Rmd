@@ -1,12 +1,12 @@
 ---
-title: "03. Modelling in R: From a Chemostat to NPZ with Phyto- and Zooplankton"
+title: "03. Modelling in R: FromChemostat to NPZ"
 author: "Thomas Petzoldt and Karline Soetaert"
 description: "Tutorial: extend a chemostat model towards an NPZ model with nutrient, phytoplankton and zooplankton"
 date: "July-2021"
 bibliography: aubergine.bib
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{03. Modelling in R: From a Chemostat to NPZ with Phyto- and Zooplankton}
+  %\VignetteIndexEntry{03. Modelling in R: From Chemostat to NPZ}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

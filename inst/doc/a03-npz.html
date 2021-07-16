@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Thomas Petzoldt and Karline Soetaert" />
+
+
+<title>03. Modelling in R: FromChemostat to NPZ</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">03. Modelling in R: FromChemostat to NPZ</h1>
+<h4 class="author">Thomas Petzoldt and Karline Soetaert</h4>
+<h4 class="date">July-2021</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The example shows how a chemostat model <span class="citation">(cf. Novick and Szilard 1950; Herbert, Elsworth, and Telling 1956)</span> with heterotrophic or autotrophic organisms (bacteria, algae, <span class="math inline">\(P\)</span>), can be extended to a simple NPZ model with nutrients, phytoplankton and zooplankton.</p>
+<p>It builds on the chemostat model with two equations from the previous tutorial.</p>
+<p>Please don’t get confused! Here <strong>P</strong> is phytoplankton and not phosphorus, while the symbol for the nutrient <strong>N</strong> does not necessarily mean that it is nitrogen.</p>
+</div>
+<div id="implementation-of-the-chemostat" class="section level2">
+<h2>Implementation of the chemostat</h2>
+<p>The chemostat model is repeated here. The model is written in the <strong>R</strong> programming language for statistical computing <span class="citation">(R Core Team 2018)</span>, and solved numerically with solvers from package <strong>deSolve</strong> <span class="citation">(Soetaert, Petzoldt, and Setzer 2010b)</span>; equilibria are estimated with package <strong>rootSolve</strong> <span class="citation">(Soetaert 2009)</span>. See <span class="citation">Soetaert, Petzoldt, and Setzer (2010b)</span> or <span class="citation">Soetaert, Petzoldt, and Setzer (2010a)</span> for details.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;deSolve&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>chemostat <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(y, parms)), {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    p_growth <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    dN_dt   <span class="ot">&lt;-</span> <span class="sc">-</span>c_pn <span class="sc">*</span> p_growth <span class="sc">+</span> d <span class="sc">*</span> (N0 <span class="sc">-</span> N)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    dP_dt   <span class="ot">&lt;-</span>         p_growth <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> P)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt), <span class="at">p_growth =</span> p_growth)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_pgrow =</span> <span class="fl">0.5</span>,   <span class="co"># phytoplankton growth parameter (1/d)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_n     =</span> <span class="fl">1.0</span>,   <span class="co"># half saturation constant, P (mmol/m3)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_pn    =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="co"># stoichiometric conversion from phosphorus P to phyto C (P:C ratio)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">d       =</span> <span class="fl">0.1</span>,   <span class="co"># dilution rate (1/d)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">N0      =</span> <span class="dv">5</span>      <span class="co"># Phosphorus in inflow (mmol/m3)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from=</span><span class="dv">0</span>, <span class="at">to=</span><span class="dv">40</span>, <span class="at">by=</span><span class="fl">0.1</span>)  <span class="co"># simulation time (d)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>y     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">N =</span> <span class="dv">5</span>, <span class="at">P =</span> <span class="dv">1</span>)             <span class="co"># Nutrient (mmolP/m3) N and Phytoplankton (mmolC/m3)</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, chemostat, parms) <span class="co"># solve model</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="npz-extension-of-the-chemostat-model" class="section level2">
+<h2>NPZ extension of the chemostat model</h2>
+<p>The chemostat equations can serve as a starting point for further extensions, e.g. the production of specific substances in bioreactors, or additional trophic levels. The equations are fundamental for the description of other flow-through systems, up to waste water treatment plants, or lakes.</p>
+<p>Here we implement zooplankton as a third state variable and then test the behavior of this more complex model.</p>
+<p>Following the equations of <span class="math inline">\(P\)</span> and <span class="math inline">\(N\)</span> of the chemostat:</p>
+<p><span class="math display">\[\begin{align}
+\frac{dN}{dt} &amp;= - -c_{pn} \cdot r \cdot \frac{N}{k_n+N}\cdot P + d \cdot (N_0-N) \\
+\frac{dP}{dt} &amp;=  r \cdot \frac{N}{k_n+N}\cdot P + d \cdot (0-P)
+\end{align}\]</span></p>
+<p>we can add a 3rd equation for zooplankton <span class="math inline">\(Z\)</span> as:</p>
+<p><span class="math display">\[\begin{align}
+\frac{dZ}{dt} &amp;= c_{asseff} \cdot c_{pn} \cdot r_{zgraz} \cdot \frac{P}{k_P + P} \cdot Z - r_{zloss} \cdot Z - d \cdot Z
+\end{align}\]</span></p>
+<p>with <span class="math inline">\(c_{asseff}\)</span> = assimilation efficiency, <span class="math inline">\(r_{zgraz}\)</span> = zooplankton grazing parameter, <span class="math inline">\(r_{zloss}\)</span> = zooplankton loss parameter, and <span class="math inline">\(k_P\)</span> = Monod constant of zooplankton growth on phytoplankton. Units and parameter values are found in the code below.</p>
+<p>Let’s also assume, that nutrients from unused food <span class="math inline">\((1-c_{asseff})\)</span> are recycled, so we can write the full system:</p>
+<p><span class="math display">\[\begin{align}
+    p_{growth}    &amp;= r_{pgrow} \cdot \frac{N}{k_n + N}  \cdot P\\
+    z_{grazing}   &amp;= r_{zgraz}  \cdot \frac{P}{k_p + P} \cdot Z\\
+    z_{growth}    &amp;= c_{asseff} \cdot z_{grazing}\\
+    n_{recycling} &amp;= (1 - c_{asseff}) \cdot z_{grazing}\\
+    \\
+    \text{and the state equations:}\\
+    \frac{dN}{dt}   &amp;= c_{pn} \cdot (-p_{growth} + n_{recycling}) + d \cdot (N_0 - N)\\
+    \frac{dP}{dt}   &amp;= p_{growth} - z_{grazing}             + d \cdot (0 - P)\\
+    \frac{dZ}{dt}   &amp;= z_{growth} - r_{zloss}  \cdot Z      + d \cdot (0 - Z)
+\end{align}\]</span></p>
+<p>Formulations like <span class="math inline">\(d \cdot (0-P)\)</span> were chosen for didactic reasons. This is the transport term “import - export.” This can then be extended to the 1D case where the values given in the parenthesis (e.g. 0, <span class="math inline">\(N_0\)</span>) are then called upper and lower boundary conditions.</p>
+<div id="implementation-of-the-npz-model" class="section level3">
+<h3>Implementation of the NPZ model</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;deSolve&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>npz <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(y, parms)), {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    p_growth     <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    z_grazing    <span class="ot">&lt;-</span> ...</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    z_growth     <span class="ot">&lt;-</span> ...</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    n_recycling  <span class="ot">&lt;-</span> ...</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    dN_dt   <span class="ot">&lt;-</span> c_pn <span class="sc">*</span> (<span class="sc">-</span>p_growth <span class="sc">+</span> n_recycling) <span class="sc">+</span> d <span class="sc">*</span> (N0 <span class="sc">-</span> N)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    dP_dt   <span class="ot">&lt;-</span> p_growth <span class="sc">-</span> z_grazing             <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> P)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    dZ_dt   <span class="ot">&lt;-</span> ...</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt, ...))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_pgrow  =</span> <span class="fl">0.5</span>,   <span class="co"># phytoplankton growth parameter (1/d)</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zgraz  =</span> <span class="fl">0.4</span>,   <span class="co"># zooplankton grazing parameter (1/d)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zloss  =</span> <span class="fl">0.0</span>,   <span class="co"># zooplankton loss parameter (1/d)</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_n      =</span> <span class="fl">0.5</span>,   <span class="co"># Monod constant of phyto growth on nutrient (mmol/m3)</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_p      =</span> <span class="dv">100</span>,   <span class="co"># Monod constant of zoo growth on phyto (mmol/m3)</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_pn     =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="co"># stoichiometric conversion from phosporus P to phyto C (P:C ratio)</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_asseff =</span> <span class="fl">0.3</span>,   <span class="co"># zooplankton assimilation efficiency (-)</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">d       =</span> <span class="fl">0.1</span>,    <span class="co"># dilution rate (1/d)</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">N0      =</span> <span class="dv">5</span>       <span class="co"># P in inflow (mmol/m3)</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">40</span>, <span class="fl">0.1</span>)        <span class="co"># (d)</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">N=</span><span class="dv">5</span>, <span class="at">P=</span><span class="dv">1</span>, <span class="at">Z=</span><span class="dv">10</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>out0 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out0, <span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+</div>
+<div id="solution" class="section level2">
+<h2>Solution</h2>
+<p>Putting things together, you will get a code similar to the following. There are of course always different possibilities, just compare your solution with this.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;deSolve&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>npz <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(y, parms)), {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    p_growth     <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    z_grazing    <span class="ot">&lt;-</span> r_zgraz  <span class="sc">*</span> P <span class="sc">/</span> (k_p <span class="sc">+</span> P) <span class="sc">*</span> Z</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    z_growth     <span class="ot">&lt;-</span> c_asseff <span class="sc">*</span> z_grazing</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    n_recycling  <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> c_asseff) <span class="sc">*</span> z_grazing</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    dN_dt   <span class="ot">&lt;-</span> c_pn <span class="sc">*</span> (<span class="sc">-</span>p_growth <span class="sc">+</span> n_recycling) <span class="sc">+</span> d <span class="sc">*</span> (N0 <span class="sc">-</span> N)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    dP_dt   <span class="ot">&lt;-</span> p_growth <span class="sc">-</span> z_grazing             <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> P)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    dZ_dt   <span class="ot">&lt;-</span> z_growth <span class="sc">-</span> r_zloss <span class="sc">*</span> Z           <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> Z)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt, dZ_dt))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_pgrow  =</span> <span class="fl">0.5</span>,   <span class="co"># phytoplankton growth parameter (1/d)</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zgraz  =</span> <span class="fl">0.4</span>,   <span class="co"># zooplankton grazing parameter (1/d)</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zloss  =</span> <span class="fl">0.0</span>,   <span class="co"># zooplankton loss parameter (1/d)</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_n      =</span> <span class="fl">0.5</span>,   <span class="co"># Monod constant of phyto growth on nutrient (mmol/m3)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_p      =</span> <span class="dv">100</span>,   <span class="co"># Monod constant of zoo growth on phyto (mmol/m3)</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_pn     =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="co"># stoichiometric conversion from phosporus P to phyto C (P:C ratio)</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_asseff =</span> <span class="fl">0.3</span>,   <span class="co"># zooplankton assimilation efficiency (-)</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">d       =</span> <span class="fl">0.1</span>,    <span class="co"># dilution rate (1/d)</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">N0      =</span> <span class="dv">5</span>       <span class="co"># P in inflow (mmol/m3)</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">40</span>, <span class="fl">0.1</span>)        <span class="co"># (d)</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">N=</span><span class="dv">5</span>, <span class="at">P=</span><span class="dv">1</span>, <span class="at">Z=</span><span class="dv">10</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>out0 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out0, <span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAEgCAMAAABcujGyAAAAilBMVEUAAAAAADoAAGYAOmYAOpAAZpAAZrY6AAA6ADo6AGY6OmY6OpA6ZrY6kLY6kNtmAABmADpmAGZmOgBmOjpmOpBmZjpmkNtmtv+QOgCQOjqQOmaQkDqQtpCQ27aQ29uQ2/+2ZgC2Zjq2/7a2///bkDrbtmbb25Db////tmb/25D/27b//7b//9v///92H1E/AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAM+UlEQVR4nO2dDXfixhlGxcaFbZ2adZPG9jZdnEBtCPD//14lvDkxGElo5v3ScO/JyZ5kmUd6NZeRRsCo2gMEpvLeAYAuEBRCg6AQGgSF0CAohAZBITQICqFBUAgNgkJoEBRCg6AQGgSF0CAohAZBITQICqFBUAgNgkJoEBRCg6AQGgSF0CAohMZL0O3803K/e6z/VSbbeVXzw8J7P9RYN/VVd+rb8RO0mpYt6M3r/o/5pFxDa1bVg/o2HAWdLEoX1KQH/djMpvobcRS0miLomLHpPT9Bp8+Tb4UL+se82Pr2Vu8+R0E3s7+VLGjhk6T6BN+cI9RxFHT/XFUFC2rSfX7sHm0mgJ6CbmYIOlpWBreYGjwFrYdQBB0pZvNbV0E3MwQdKbvHw416/SL5qBNCg6AQGgSF0CAohAZBITQICqFBUAgNgkJoEBRCg6AQGgSF0CAohAZBITQICqFBUAgNgkJoEBRCg6AQGgSF0KQIWsVD9pjE43rrSxI0+dBoIdyBomkSXHF9CKqdJkHqHr2tkXi6wsKo6rtuQQvowC52j4fVkza3xz8OHlV9Vy1oCR3YxfZ++e6P3DRFUgVtKlt9/HX+qArsooQO7OLPN+DfR1xfn6DracEjTAkd2MlmNvpLmD5BV3fvR5j3NwUuu0tgQ9QOlLoDI7VHR/0nlClBsqDzm5df6j9+7hlB3T0NOosXOyIa9ZUgaDPETBabz5eOMG6SxpzFC47EYkl/pZUh6PA2Lo7GnMW7C/q2zPOHZYKvW9C9h6NSs3jRSxXBg5Aatf1ybhXkKi9UAfP7oNaKhpzFBxB0vz63gCeC7gXnBxcRchYfQdCutOsW1NbQkLN4BL0Yn486DRXNuAZV+6RMsnoElYo7fp3ZIUgXVO+TMgS9HK8vi5gZmi7o8SdlWWknhBc0kKFegpoZmnyf8LJPypJA0MtxE9TK0OStDPukbBAIejl+ghodhIizeAS9HEdBbY4CgqakIejhxRaHIaCgoruEoFJxQlsYCoKmpCFo+iYGgqBJaWEMRVD7NAQdgK+gBscBQZPSEDR9G55bKEfQt4dm37WlIWjGRhw3UI6gvy32mx/3q2lLGoJmbMRxA8UI2nzJYPe0aP3FAILmbMUvXyItxB7Vcu53X5ft39aKYiiCmqfF2KPmV3MPHd81QNA/WygfiRg6SGfopyFozmbc4hHUGgRtQW/hBgQdgr+gyocidRKht3ADgg4BQc+juPziOASNYmiWoM29iqFtUraTQ+YIqrBwA4IOIVXQzrV95PYhn9RwvYUbEHQIySPoZnZ3NIJmrF0UUlC1NOFqEbSV1eSbyCk+pqBqs3gEHUTONeju8bT/yhFUbxY/FkGDGBpgFq97KKRm8WLLLyLoIBD0PHqzeAQdBIK2oDaLR9BBhBBU81gwi09NQ9DsZtrRMh9EyEfoxSGoaDPFaMkPIkR2yCauav0PLxC0hdMPIvLSJBM08xBUuJ1mstgHEcIJmnkIKtxONVnqgwjhBJm8zWzy3/npFQyCSrezTi5G0N3XZfOkpM4FehE0v511cjGCbu+Xzadk3Z+URTAUQY3Tggj6fQTt/q4Bggo0tA0uRtD9uuq9BkVQiYa2weUIekkaggo0tA1GUGsQ1DZNvE7V+gIYiqC2aQg6kCiCqh0LBM1IQ1CJlpa5CGoNgtqmIehAENQ2bVyCBjAUQW3TEHQgYQTVOhYImpOGoCJNNWKVFm5A0IEg6HmUFm6QLxJBpeIUmyrEKi2/ODZB/Q1F0PMoLdyAoENB0BZ0Fm5A0KEkC7quJr/Oer5PKLYrYVIR1JpUQXdPi83sQXQSEUtQnVk8gg4lVdB69rD72vebFrFdsU8tfRa/nZ8+R7YlzdvQ5BH0rQM7fxUotyv2qUrLL8YR9P4/p5dn59PGKuj+8BS9teQpMJSgpc/im191zquHdzktb8DRCirXRqKtfKrKLF6hxKwzxHP/2lMIKtTYJrQwQS9JczYUQVuQv42W31w/EkHVGguHKtxGy2+uH4mgao2FQz/cRstKE2quH4mgao2FQxVuo+U3149EULXG0qHyt9Hym+tHnkvzNRRBLdMQdDCRBFU5FJEEHWd9CCrU2iLzGutDUKHWFplXWZ+roQhqmDbS+hBUprVF5lXWh6AyrS0yr7I+BJVpbZF5nfV5Goqgdmmjvc+LoELN9SMR1BoEtUtD0AQQ1C5ttIJ6GoqgdmmhBN18Xqw/PG0cQXWb60cWI2jzhezb10u/kI2gMs0lIxUWbogk6PZ+ufnx4p9VI6hMc8FIhYUbdHo5NfW3RT2I7htJL0nzMxRBz6Ow/GIsQXePzYB5c/z+Q1Dt9mKJCgs3xBJ0WBqCCrWXS5RfuAFBU0BQs7QxC+pnKIK2ID+LR9AUkgWtT4HTgtdwl5/FK3Uxgp6n6cD1p2WxgsovvzhuQd0MTRX00HPb+99LXT9TfhaPoEkkj6BPzdXZ9qdS18+Un8UjaBIZ16DNELPuXV9Sbn8iBCKoNcFm8XEEFZ8EjlxQL0MR9Dzik0Ct/kVQqTijAKHAD5PArLSslpa5CKoeIBQoPgkcvaBOhiJoC9KTQARNA0GN0hA0DQQ1Shu/oD6GIqhNmlrnIqhUnFmCZh6CWoOgNmnRBG1uo60u/8lH1rayQFCbtICCrqdDv06IoCIJmnklCbq6G/p1QgQVSdDMS03T69pUQec3L78Mfg6Ug6EIapIWTtDmk4jJ4vAwqAFpCIqgvskIapCgmXflgjoYiqAWaYr9iqBScYYRenEIag2CWqQVI6i9oQjagujCDQiaDIKeR3ThBs1etRbU2lAEPY/o8osFCWo+hCLoeUQXbkDQdBC0BcmFG0oS1NpQBNVPU+1SBJWKM4yQiBOcxRcmqK2hCHoeyVl8WYIaD6HxBI1wUhZdflG3QxFUKs40IztNcBZfmqC2hqYKup2/jSifZNcH7d2uWZrcLB5Bc0geQbdfFmf+bzmCiqUpd6dHfZaGpp/i16e/CLygzUW4KyWbFljQtwWohqeNQ1CxNhoZgdJiCvrhEm1QmqGhCHqevA7M3756/mZ2dzSCDppDGN4LRdAWpK6xowq6368m3xJP8ZZDKIK2IXONrT7WZOTvHk9vUlwuqJmhAQWVNdRZd/WOdKoPQaVAUJU0syEUQVXT9LvRqz4EFQJBldKMDEVQzTSDTkRQqTjjEJWwgWkWF2p+9dkYiqCKaRZd6CioiaEIqpfm3YHaad71uQkqWvkVjzDqac5nCATNS3O/RlNPc77GRtCsNP9Zrn6agaEIqpQW4Ea2QRqChsoa2UeBFmmeH+UiaHpaiG/7mKRpFxpSUMmqPTrQcm0Db0G1DUVQ+TTTtTfcBVU2FEGl0+IsDWOVploxgsqmySwNMIAAgqoaGlNQwcNu2YFCK1cMInWD62ry6+z0N4GpaYp1I6hUmoed++T6dk+LzexBaInzvaKiQQX1Dxqw/KLcqj8JJG52e7/cfV2KLI72LiC9dXts0l+JtmlJEqo3dYTpXH6xOiZrBzPJq2/gw2T79uXoeFTZ9OyR/y0H5QK76Fx+0VfJY1J35fAc2bXQY3ZOQt4dqvywpL8SbaNL5ggq8hAFTSLM4jVJFlT0QVeKJI8wgg9R0ARBzyP6oCtNrrgD3dMkSBVUcIlsXa64A93TJMgdQblGc+aK6+ve2ZZrtHgIHCTqc6RjZ9PLzH+FQITecEB9IepDUMVNUx+CXn0HJjOS+hBUcdPUh6BX34HJjKQ+BFXcNPV5CgpgAIJCaBAUQoOgEBoEhdAgKIQGQSE0CAqhQVAITaqg66p66Pr7w7fw21+0e6yqaXfK8+HvurezuuvfkzSoL0h9iYJuvyxOv2d//PfzT8uuF62mzdf1u1LW0+YgdW+neRx6356kQX1R6ksUdHP7uvvwHPK/2H39vX4H9rxoddfzgrrAzlfsnv5917eRRKgvSn2Jgtbvj/1z18jcnCK6X1S/ovsFq3ro73zF6q4+RfTuSRLUF6U+N0Hrob035fmh6xX1ey9wB1KfTH06p/i3ArtedFiUpS+l+ySyan5t1XeaSYT6otSnNEk6FNjxorf/33ORXb+zeraz8ppEUJ9VfU63mZ4P756+2xS9NyHC3oahPqn6uFEPoUFQCA2CQmgQFEKDoBAaBIXQICiEBkEhNAgKoUFQCA2CQmgQFEKDoBAaBIXQICiEBkEhNAgKoXEQdPvz6+nTP4uC+iRxELTo3ttTnyz2gu4eq5uX25d//Kv65+Pbz1qm5vugCfWJ4jOCbm5fPi829T+3L/XbUf5n365QnyRugjb/qv/539vPA0uC+iRxF7Ss818D9UniLWh9qvj+VPpioD5JPG4zzZuL7O8FvhY3iaA+UbhRD6FBUAgNgkJoEBRCg6AQGgSF0CAohAZBITQICqFBUAgNgkJoEBRCg6AQGgSF0CAohAZBITT/B+M5IGUz9wQ/AAAAAElFTkSuQmCC" style="display: block; margin: auto;" /></p>
+</div>
+<div id="complete-code" class="section level2">
+<h2>Complete code</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;deSolve&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>npz <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(y, parms)), {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    p_growth     <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    z_grazing    <span class="ot">&lt;-</span> r_zgraz  <span class="sc">*</span> P <span class="sc">/</span> (k_p <span class="sc">+</span> P) <span class="sc">*</span> Z</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    z_growth     <span class="ot">&lt;-</span> c_asseff <span class="sc">*</span> z_grazing</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    n_recycling  <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> c_asseff) <span class="sc">*</span> z_grazing</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    dN_dt   <span class="ot">&lt;-</span> c_pn <span class="sc">*</span> (<span class="sc">-</span>p_growth <span class="sc">+</span> n_recycling) <span class="sc">+</span> d <span class="sc">*</span> (N0 <span class="sc">-</span> N)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    dP_dt   <span class="ot">&lt;-</span> p_growth <span class="sc">-</span> z_grazing             <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> P)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    dZ_dt   <span class="ot">&lt;-</span> z_growth <span class="sc">-</span> r_zloss <span class="sc">*</span> Z           <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> Z)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt, dZ_dt))</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_pgrow  =</span> <span class="fl">0.5</span>,   <span class="co"># phytoplankton growth parameter (1/d)</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zgraz  =</span> <span class="fl">0.4</span>,   <span class="co"># zooplankton grazing parameter (1/d)</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zloss  =</span> <span class="fl">0.0</span>,   <span class="co"># zooplankton loss parameter (1/d)</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_n      =</span> <span class="fl">0.5</span>,   <span class="co"># Monod constant of phyto growth on nutrient (mmol/m3)</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_p      =</span> <span class="dv">100</span>,   <span class="co"># Monod constant of zoo growth on phyto (mmol/m3)</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_pn     =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="co"># stoichiometric conversion from phosporus P to phyto C (P:C ratio)</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_asseff =</span> <span class="fl">0.3</span>,   <span class="co"># zooplankton assimilation efficiency (-)</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">d       =</span> <span class="fl">0.1</span>,    <span class="co"># dilution rate (1/d)</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">N0      =</span> <span class="dv">5</span>       <span class="co"># P in inflow (mmol/m3)</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">40</span>, <span class="fl">0.1</span>)        <span class="co"># (d)</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">N=</span><span class="dv">5</span>, <span class="at">P=</span><span class="dv">1</span>, <span class="at">Z=</span><span class="dv">10</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>out0 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out0, <span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="dynamic-behavior" class="section level2">
+<h2>Dynamic behavior</h2>
+<p>The model above is able to show various dynamic behavior, e.g. different equilibria and Lotka-Volterra cycles, depending on the parameter values.</p>
+<div id="exercise" class="section level3">
+<h3>Exercise</h3>
+<p>Adapt the model parameters and try to reproduce the following dynamic patterns:</p>
+<ul>
+<li>scenario 0: equilibrium, algae extinct</li>
+<li>scenario 1: Lotka-Volterra cycle</li>
+<li>scenario 2: equilibrium, zooplankton extinct</li>
+<li>scenario 3: equilibrium, coexistence</li>
+<li>scenario 4: equilibrium, both extinct</li>
+<li>scenario 5: damped oscillation</li>
+</ul>
+<p>Start to change the parameter <span class="math inline">\(d\)</span> only and if time allows play also with other parameters.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;deSolve&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>npz <span class="ot">&lt;-</span> <span class="cf">function</span>(time, y, parms) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">as.list</span>(<span class="fu">c</span>(y, parms)), {</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    p_growth     <span class="ot">&lt;-</span> r_pgrow <span class="sc">*</span> N <span class="sc">/</span> (k_n <span class="sc">+</span> N) <span class="sc">*</span> P</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    z_grazing    <span class="ot">&lt;-</span> r_zgraz  <span class="sc">*</span> P <span class="sc">/</span> (k_p <span class="sc">+</span> P) <span class="sc">*</span> Z</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    z_growth     <span class="ot">&lt;-</span> c_asseff <span class="sc">*</span> z_grazing</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    n_recycling  <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> c_asseff) <span class="sc">*</span> z_grazing</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    dN_dt   <span class="ot">&lt;-</span> c_pn <span class="sc">*</span> (<span class="sc">-</span>p_growth <span class="sc">+</span> n_recycling) <span class="sc">+</span> d <span class="sc">*</span> (N0 <span class="sc">-</span> N)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    dP_dt   <span class="ot">&lt;-</span> p_growth <span class="sc">-</span> z_grazing             <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> P)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    dZ_dt   <span class="ot">&lt;-</span> z_growth <span class="sc">-</span> r_zloss <span class="sc">*</span> Z           <span class="sc">+</span> d <span class="sc">*</span> (<span class="dv">0</span> <span class="sc">-</span> Z)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(<span class="fu">c</span>(dN_dt, dP_dt, dZ_dt))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>   })</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>parms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_pgrow  =</span> <span class="fl">0.5</span>,   <span class="co"># phytoplankton growth parameter (1/d)</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zgraz  =</span> <span class="fl">0.4</span>,   <span class="co"># zooplankton grazing parameter (1/d)</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">r_zloss  =</span> <span class="fl">0.0</span>,   <span class="co"># zooplankton loss parameter (1/d)</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_n      =</span> <span class="fl">0.5</span>,   <span class="co"># Monod constant of phyto growth on nutrient (mmol/m3)</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">k_p      =</span> <span class="dv">100</span>,   <span class="co"># Monod constant of zoo growth on phyto (mmol/m3)</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_pn     =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">106</span>, <span class="co"># stoichiometric conversion from phosporus P to phyto C (P:C ratio)</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">c_asseff =</span> <span class="fl">0.3</span>,   <span class="co"># zooplankton assimilation efficiency (-)</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">d       =</span> <span class="fl">0.1</span>,    <span class="co"># dilution rate (1/d)</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">N0      =</span> <span class="dv">5</span>       <span class="co"># P in inflow (mmol/m3)</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">40</span>, <span class="fl">0.1</span>)        <span class="co"># (d)</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Nutrient in Phosphorus P; Phyto and Zoo in C and (mol/m3)</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">N=</span><span class="dv">5</span>, <span class="at">P=</span><span class="dv">1</span>, <span class="at">Z=</span><span class="dv">10</span>)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>out0 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out0, <span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">800</span>)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.0</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out, <span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+</div>
+<div id="dynamic-behavior-hints-and-solution" class="section level2">
+<h2>Dynamic behavior: Hints and solution</h2>
+<p>If we try the following, we can observe different qualitative system behavior. The individual scenarios allow to reproduce the simulations yourself. Plot the scenarios and try to understand whether it is an equilibrium and which pupulations survive or die out.</p>
+<div id="scenario-0-batch" class="section level3">
+<h3>Scenario 0: Batch</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">800</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.0</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>out0 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out0, <span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+<div id="scenario-1" class="section level3">
+<h3>Scenario 1</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>out1 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out1, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+<div id="scenario-2" class="section level3">
+<h3>Scenario 2</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.07</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>out2 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out2, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+<div id="scenario-3" class="section level3">
+<h3>Scenario 3</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.09</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>out3 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out3, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+<div id="scenario-4" class="section level3">
+<h3>Scenario 4</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>out4 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out4, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+<div id="scenario-5" class="section level3">
+<h3>Scenario 5</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>parms[<span class="st">&quot;d&quot;</span>] <span class="ot">&lt;-</span> <span class="fl">0.081</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>out5 <span class="ot">&lt;-</span> <span class="fu">ode</span>(y, times, npz, parms)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out5, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</span></code></pre></div>
+</div>
+<div id="solution-1" class="section level3">
+<h3>Solution</h3>
+<p>The final plot shows all scenarios together.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(out0, out1, out2, out3, out4, out5, <span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">lty=</span><span class="dv">1</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend=</span><span class="fu">c</span>(<span class="st">&quot;EQ, No Algae&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;Lotka-Volterra&quot;</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;EQ, No Zoo&quot;</span>, </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;EQ, coexistence&quot;</span>, </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;EQ. both extinct&quot;</span>, </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;Damped oscillation&quot;</span>), </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">lty=</span><span class="dv">1</span>, <span class="at">col=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">cex=</span><span class="fl">0.5</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="outlook" class="section level2">
+<h2>Outlook</h2>
+<p>The example shows that even such a simple model can show surprisingly complex behavior. It can therefore serve as a starting point in different directions, practically by extending the model and making it more realistic, and theoretically by analysing its behavior more systematically by, for example, stability and bifurcation analysis.</p>
+<div id="references" class="section level3">
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Herbert1956" class="csl-entry">
+Herbert, Denis, R Elsworth, and RC Telling. 1956. <span>“The Continuous Culture of Bacteria; a Theoretical and Experimental Study.”</span> <em>Microbiology</em> 14 (3): 601–22.
+</div>
+<div id="ref-Novick1950" class="csl-entry">
+Novick, Aaron, and Leo Szilard. 1950. <span>“Description of the Chemostat.”</span> <em>Science</em> 112 (2920): 715–16.
+</div>
+<div id="ref-RCore2018" class="csl-entry">
+R Core Team. 2018. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.
+</div>
+<div id="ref-Soetaert2009" class="csl-entry">
+Soetaert, Karline. 2009. <em><span class="nocase">rootSolve</span>: Nonlinear Root Finding, Equilibrium and Steady-State Analysis of Ordinary Differential Equations. <span>R</span> Package 1.6</em>. <a href="https://cran.r-project.org/package=rootSolve">https://cran.r-project.org/package=rootSolve</a>.
+</div>
+<div id="ref-Soetaert2010c" class="csl-entry">
+Soetaert, Karline, Thomas Petzoldt, and R. Woodrow Setzer. 2010a. <span>“<span class="nocase">Solving Differential Equations in R</span>.”</span> <em>The R Journal</em> 2 (2): 5–15. <a href="https://journal.r-project.org/archive/2010-2/RJournal_2010-2_Soetaert~et~al.pdf">https://journal.r-project.org/archive/2010-2/RJournal_2010-2_Soetaert~et~al.pdf</a>.
+</div>
+<div id="ref-Soetaert2010a" class="csl-entry">
+———. 2010b. <span>“Solving Differential Equations in <span>R</span>: Package <span><span class="nocase">de</span>Solve</span>.”</span> <em>Journal of Statistical Software</em> 33 (9): 1–25. <a href="https://doi.org/10.18637/jss.v033.i09">https://doi.org/10.18637/jss.v033.i09</a>.
+</div>
+</div>
+<hr />
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

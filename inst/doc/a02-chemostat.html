@@ -13,7 +13,7 @@
 <meta name="author" content="Thomas Petzoldt and Karline Soetaert" />
 
 
-<title>Modelling in R: A Chemostat</title>
+<title>02. Modelling in R: A Chemostat</title>
 
 <script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
@@ -160,7 +160,7 @@ div.csl-indent {
 
 
 
-<h1 class="title toc-ignore">Modelling in R: A Chemostat</h1>
+<h1 class="title toc-ignore">02. Modelling in R: A Chemostat</h1>
 <h4 class="author">Thomas Petzoldt and Karline Soetaert</h4>
 <h4 class="date">July-2021</h4>
 
@@ -177,14 +177,12 @@ div.csl-indent {
 <p>The example shows a chemostat model <span class="citation">(cf. Novick and Szilard 1950; Herbert, Elsworth, and Telling 1956)</span> by example of heterotrophic or autotrophic organisms (bacteria, algae, <span class="math inline">\(P\)</span>), where growth is limited by a single nutrient (e.g. phosphorus, <span class="math inline">\(N\)</span>) via a Monod equation.</p>
 <p>We use here a notation, compatible with the so-called NPZ and NPZD models where <span class="math inline">\(N\)</span> is a nutrient (nitrogen or phosphorus), <span class="math inline">\(P\)</span> is phytoplankton, <span class="math inline">\(Z\)</span> zooplankton and (optionally) <span class="math inline">\(D\)</span> is detritus. Please don’t get confused! Here <strong>P</strong> is phytoplankton and not phosphorus, while the symbol for the nutrient <strong>N</strong> does not necessarily mean that it is nitrogen.</p>
 <p>The equations governing the dynamics of <strong>P</strong> and <strong>N</strong> are: <span class="math display">\[
-\frac{dN}{dt}=-r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(N_0-N)
+\frac{dN}{dt}=-c_{pn} \cdot r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(N_0-N)
 \]</span> <span class="math display">\[
 \frac{dP}{dt}=r \cdot \frac{N}{k_n+N}\cdot P + d \cdot(0-P)
 \]</span></p>
-<p>where d is the dilution rate, and the nutrient and phytoplankton concentration in the inflowing water is <span class="math inline">\(N_0\)</span> and <span class="math inline">\(0\)</span> respectively.</p>
-</div>
-<div id="implementation" class="section level2">
-<h2>Implementation</h2>
+<p>where <span class="math inline">\(d\)</span> is the dilution rate, and the nutrient and phytoplankton concentration in the inflowing water is <span class="math inline">\(N_0\)</span> and <span class="math inline">\(0\)</span> respectively.</p>
+<p>The constant <span class="math inline">\(c_{pn}\)</span> is the stoichiometric conversion factor to go from nutrient N (phosphorus) to phytoplankton C (i.e. the molar P:C ratio). It is here used in inverse form, therefore <span class="math inline">\(c_pn\)</span>. ## Implementation</p>
 <p>The system of differential equations is solved numerically with solvers from package <strong>deSolve</strong> <span class="citation">(Soetaert, Petzoldt, and Setzer 2010b)</span>, while equilibria at infinite time are estimated with package <strong>rootSolve</strong> <span class="citation">(Soetaert 2009)</span>. The implementation follows the standard formulation of these packages, see package documentation of <strong>deSolve</strong> and <strong>rootSolve</strong>, and <span class="citation">Soetaert, Petzoldt, and Setzer (2010b)</span> or <span class="citation">Soetaert, Petzoldt, and Setzer (2010a)</span> for details. The code is written in the <strong>R</strong> programming language for statistical computing <span class="citation">(R Core Team 2018)</span>.</p>
 <div id="the-code" class="section level3">
 <h3>The code</h3>
