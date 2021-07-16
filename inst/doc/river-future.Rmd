@@ -160,7 +160,7 @@ model cannot be written in matrix notation. The C or Fortran code can
 be written by hand or created from a code generator. Here, manual
 programming is not that difficult, because only the numerical parts
 need to be encoded. More about this can be found in the [package
-vignettte](https://cran.r-project.org/web/packages/deSolve/vignettes/compiledCode.pdf)
+vignettte](https://cran.r-project.org/package=deSolve/vignettes/compiledCode.pdf)
 of **deSolve** and in a [small
 tutorial](https://tpetzoldt.github.io/deSolve-compiled/deSolve-compiled.html)
 on Github.
