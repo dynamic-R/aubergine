@@ -237,7 +237,7 @@ dilution rates within a sensible range. The other two columns are then reserved
 for storing the results.
 
 ```{r, steadystate, exercise=TRUE, exercise.lines=30, fig.height=3, fig.width=8}
-<<exercise>>
+<<chemostat>>
 state <- data.frame(
   d = seq(0.01, 0.5, length.out = 100),
   N = 0,
