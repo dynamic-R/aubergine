@@ -1,7 +1,7 @@
 Package: aubergine
 Type: Package
 Title: Tutorials and Exercises for a 1-Day Workshop
-Version: 0.2.1
+Version: 0.2.2
 Author: Karline Soetaert and Thomas Petzoldt
 Maintainer: Karline Soetaert <Karline.Soetaert@nioz.nl>
 Depends: R (>= 3.0), learnr, ReacTran, deSolve, rootSolve, future
