@@ -21,16 +21,35 @@ library("scatterplot3d")
 
 ## Introduction
 
-The implementation of differential equation models directly in **R** [@RCore2018] is ideal for the development of dynamic models, because everything can be immediately tested and the whole infrastructure of **R** can be used. However, this adds considerable overhead, especially due to the automatic checking and type conversion of **R**, so that models cannot run with unlimited performance in this mode.
+The implementation of differential equation models directly in **R**
+[@RCore2018] is ideal for the development of dynamic models, because
+everything can be immediately tested and the whole infrastructure of
+**R** can be used. However, this adds considerable overhead,
+especially due to the automatic checking and type conversion of **R**,
+so that models cannot run with unlimited performance in this mode.
 
-Fortunately, there is a way to unlock the handbreake. Both **R** in general and package **deSolve** [@Soetaert2010c;@Soetaert2010a] in particular allow to write time-critical parts in a so-called compiled language, e.g. Fortran or C/C++. Then, all solvers of **deSolve** allow direct communication between solvers and a compiled model on the machine code level, while keeping R's facilities for data management and visualisation. Details are described in the package vignette [$\rightarrow$ compiledCode](https://CRAN.R-project.org/package=deSolve/vignettes/compiledCode.pdf) of **deSolve** while the short tutorial here serves as a quick introduction.
+Fortunately, there is a way to unlock the handbreake. Both **R** in
+general and package **deSolve** [@Soetaert2010c;@Soetaert2010a] in
+particular allow to write time-critical parts in a so-called compiled
+language, e.g. Fortran or C/C++. Then, all solvers of **deSolve**
+allow direct communication between solvers and a compiled model on the
+machine code level, while keeping R's facilities for data management
+and visualisation. Details are described in the package vignette
+[$\rightarrow$
+compiledCode](https://CRAN.R-project.org/package=deSolve/vignettes/compiledCode.pdf)
+of **deSolve** while the short tutorial here serves as a quick
+introduction.
 
 **General principle**
 
 * Implement the core model (and only this) in C or Fortran,
 * Use data handling, storage and plotting facilities of **R**.
 
-**R** starts the solver with the compiled model, both communicate directly without the overhead of calling back to **R**, and finally the solver returns the results tu the **R** level where it is accessible by the user. We start with a model in pure **R* and then show compiled versions.
+**R** starts the solver with the compiled model, both communicate
+directly without the overhead of calling back to **R**, and finally
+the solver returns the results tu the **R** level where it is
+accessible by the user. We start with a model in pure **R* and then
+show compiled versions.
 
 ## The Lorenz system in pure R
 
@@ -110,8 +129,8 @@ plot(out)
 scatterplot3d(out[,-1], type="l")
 ```
 
-Don't forget to `dyn.unload` the model afterwards, otherwise the DLL will remain 
-locked and cannot be overwritten in a next compiler run.
+Don't forget to `dyn.unload` the model afterwards, otherwise the DLL
+will remain locked and cannot be overwritten in a next compiler run.
 
 
 ## The Lorenz system in Fortran
@@ -120,10 +139,11 @@ locked and cannot be overwritten in a next compiler run.
 <!---
 Note:
 
-Rmarkdown is capable to call fortran and c code directly from the code chunks, 
-so it is (theoretically and practically) not necessary to have the c/fortran files 
-on the hard disc. It then compiles it to a temprary dll 
-(with a cryptic random file name) and loads this directly.
+Rmarkdown is capable to call fortran and c code directly from the code
+chunks, so it is (theoretically and practically) not necessary to have
+the c/fortran files on the hard disc. It then compiles it to a
+temprary dll (with a cryptic random file name) and loads this
+directly.
 
 I don't use this here, intentionally. T.P.
 --->
@@ -179,12 +199,13 @@ plot(out)
 scatterplot3d(out[,-1], type="l")
 ```
 
-Don't forget to unload the model afterwards, otherwise the DLL will remain 
-locked and cannot be overwritten in a next compiler run.
+Don't forget to unload the model afterwards, otherwise the DLL will
+remain locked and cannot be overwritten in a next compiler run.
 
 ## Benchmark
 
-Run the 3 versions (R, C, Fortran) several times in an R script and make a benchmark.
+Run the 3 versions (R, C, Fortran) several times in an R script and
+make a benchmark.
 
 ```{r eval=FALSE}
 library(deSolve)
@@ -220,7 +241,12 @@ dyn.unload("lorenzf.dll")
 
 ## Outlook
 
-More can be found in the package vignette [compiledCode](https://CRAN.R-project.org/package=deSolve/vignettes/compiledCode.pdf) or in the paper of @Soetaert2010a. In addition to this, compiled differential equation models are also supported by other packages like **cOde** and **dMod** [@Kaschek2018;@Kaschek2018b] or **rodeo**  [@Kneis2017;@rodeo2018].
+More can be found in the package vignette
+[compiledCode](https://CRAN.R-project.org/package=deSolve/vignettes/compiledCode.pdf)
+or in the paper of @Soetaert2010a. In addition to this, compiled
+differential equation models are also supported by other packages like
+**cOde** and **dMod** [@Kaschek2018;@Kaschek2018b] or **rodeo**
+[@Kneis2017;@rodeo2018].
 
 
 ## References

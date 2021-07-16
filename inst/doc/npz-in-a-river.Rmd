@@ -21,18 +21,27 @@ library("rootSolve")
 
 ## Introduction
 
-The NPZ model implemented in the previous tutorial can easily be extended from 0D 
-to 1D, using the R-package **ReacTran** [@Soetaert2012ReacTran]. Basically, 
+The NPZ model implemented in the previous tutorial can easily be
+extended from 0D to 1D, using the R-package **ReacTran**
+[@Soetaert2012ReacTran]. Basically,
 
-* the spatial domain is subdivided in a number of grid cells (function `setup.grid.1D`), and 
-* the state equations are vectorized so that they are solved for all grid cells in parallel.
-* transport (advective flow and mixing) is performed by function `tran.1D`
-* the numerical methods `ode.1D` and `steady.1D` from **deSolve** and **rootSolve** are optimised to solve one-dimensional transport problems.\footnote{`ode.1D` and `steady.1D` know the structure of the Jacobian to be 'banded' (as only adjacent grid cells depend on each other), making it possible to efficiently estimate the Jacobian}
+* the spatial domain is subdivided in a number of grid cells (function
+  `setup.grid.1D`), and
+* the state equations are vectorized so that they are solved for all
+  grid cells in parallel.
+* transport (advective flow and mixing) is performed by function
+  `tran.1D`
+* the numerical methods `ode.1D` and `steady.1D` from **deSolve** and
+  **rootSolve** are optimised to solve one-dimensional transport
+  problems.\footnote{`ode.1D` and `steady.1D` know the structure of
+  the Jacobian to be 'banded' (as only adjacent grid cells depend on
+  each other), making it possible to efficiently estimate the
+  Jacobian}
 
 ## From 0D to 1D
 
-We start with the 0D chemostat model from previous tutorial that describes the 
-dynamics of Nutrients and Phytoplankton:
+We start with the 0D chemostat model from previous tutorial that
+describes the dynamics of Nutrients and Phytoplankton:
 
 ```{r, chemostatNP}
 library (deSolve)
@@ -53,7 +62,8 @@ std  <- steady(y, times=c(0,Inf), func=chemostatNP, parms=parms,
 std$y
 ```
 
-The code below shows how this zero-dimensional NP model is extended to 1D.
+The code below shows how this zero-dimensional NP model is extended to
+1D.
 
 ```{r river-np, fig.height=4, fig.width=7}
 library(ReacTran)                                               ## CHANGED ##
@@ -191,8 +201,8 @@ plot(std, mfrow=c(1,3), grid=Grid$x.mid/1000, xlab="km")
 
 ## Solution
 
-The code of the solution is not included in the document, but can be seen in the 
-source code.
+The code of the solution is not included in the document, but can be
+seen in the source code.
 
 ```{r riverNPZ-solution, include=FALSE, fig.height=3, fig.width=7}
 library(ReacTran)
@@ -246,8 +256,8 @@ Z_init  <- rep(10,  times=nbox) # mmolC/m3
 y_init  <- c(N_init, P_init, Z_init)
 ```
 
-Now the steady state can be found with function `steady.1D` from package 
-**rootSolve**:
+Now the steady state can be found with function `steady.1D` from
+package **rootSolve**:
 
 ```{r riverNPZ-solution-plot, fig.height=3, fig.width=7}
 std <- steady.1D(y=y_init, time=0, func=riverNPZ, parms=parms,
@@ -257,8 +267,9 @@ plot(std, mfrow=c(1,3))
 
 ## The 1D NPZ model - scenarios
 
-The river model with nutrient, phytoplankton and zooplankton dynamics is now run
-with different flow rates. Flow rates are varied from 1 km /day up to 10 km per day:
+The river model with nutrient, phytoplankton and zooplankton dynamics
+is now run with different flow rates. Flow rates are varied from 1 km
+/day up to 10 km per day:
 
 ```{r riverNPZscenario, fig.height=8, fig.width=7}
 parms0 <- parms1 <- parms2 <- parms
@@ -282,16 +293,18 @@ legend("top", title="v=", legend=c("1km/d","5km/d","10km/d"),
 
 ## Outlook
 
-The 1D-NPZ model shows how straightforward transport can be implemented. We used 
-the "method of lines" where space is discretized in fixed steps while time is
-solved with standard solvers in variable time steps. This works for many problems,
-even in 2D and 3D [cf. @Soetaert2008;@Soetaert2012], but there are of course also 
+The 1D-NPZ model shows how straightforward transport can be
+implemented. We used the "method of lines" where space is discretized
+in fixed steps while time is solved with standard solvers in variable
+time steps. This works for many problems, even in 2D and 3D
+[cf. @Soetaert2008;@Soetaert2012], but there are of course also
 specialized cases where other methods are preferred.
 
-The model described here can be seen as a starting point for more complex 
-applications, e.g. with seasonal (or diurnal) forcing, variable river geometry,
-vertical exchange in the weater column of lakes or in the sediment and of course 
-also for completely different problems in other fields.
+The model described here can be seen as a starting point for more
+complex applications, e.g. with seasonal (or diurnal) forcing,
+variable river geometry, vertical exchange in the weater column of
+lakes or in the sediment and of course also for completely different
+problems in other fields.
 
 ## References
 

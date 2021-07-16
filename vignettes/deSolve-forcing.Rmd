@@ -19,42 +19,60 @@ library("deSolve")
 
 ## Introduction
 
-This short tutorial explains how differential equation models implemented in the **R** programming language for statistical computing [@RCore2018] and the add-on package **deSolve** [@Soetaert2010c;@Soetaert2010a] can be controlled by external input data.
+This short tutorial explains how differential equation models
+implemented in the **R** programming language for statistical
+computing [@RCore2018] and the add-on package **deSolve**
+[@Soetaert2010c;@Soetaert2010a] can be controlled by external input
+data.
 
-More about this can be found in the package documentation of  [**deSolve**](https://cran.r-project.org/package=deSolve) and in various papers and books that are referenced at the [deSolve home page](https://deSolve.r-forge.r-project.org).
+More about this can be found in the package documentation of
+[**deSolve**](https://cran.r-project.org/package=deSolve) and in
+various papers and books that are referenced at the [deSolve home
+page](https://deSolve.r-forge.r-project.org).
 
 ## Discontinuities in dynamic models
 
-Most solvers assume that dynamics is smooth. However, there can be several types of discontinuities:
+Most solvers assume that dynamics is smooth. However, there can be
+several types of discontinuities:
 
 1. Non-smooth external variables
 2. Discontinuities in the derivatives
 3. Discontinuites in the values of the state variables
 
 A solver does not have large problems with first two types of
-discontinuities, but changing the values of state variables is much more
-difficult.
+discontinuities, but changing the values of state variables is much
+more difficult.
 
-External variables of the first type are also called "inputs" or forcing functions and `?forcings` opens the corresponding **deSolve** help page.
+External variables of the first type are also called "inputs" or
+forcing functions and `?forcings` opens the corresponding **deSolve**
+help page.
 
 
 **Why external variables?**
 
-Some important phenomena are not explicitly included in a differential equation model, but imposed as a time series. (e.g.
-sunlight, important for plant growth is rarely "modeled"). Somehow, during the integration, the model needs to know the
-value of the external variable at each time step.
+Some important phenomena are not explicitly included in a differential
+equation model, but imposed as a time series. (e.g.  sunlight,
+important for plant growth is rarely "modeled"). Somehow, during the
+integration, the model needs to know the value of the external
+variable at each time step.
 
 
 **Implementation of forcing functions in R**
 
-R has an ingenious function that is especially suited for this task: function `approxfun`. This function is typically used in two steps. First an interpolating function is constructed. Here `approxfun` is a function that returns another function, in our case `afun` that contains both, the interpolation algorithm and the data. This is done before solving the differential equation model.
+R has an ingenious function that is especially suited for this task:
+function `approxfun`. This function is typically used in two
+steps. First an interpolating function is constructed. Here
+`approxfun` is a function that returns another function, in our case
+`afun` that contains both, the interpolation algorithm and the
+data. This is done before solving the differential equation model.
 
 ```{r, eval=FALSE}
 afun <- approxfun(data)
 ```
 
-Then, within the derivative function, this interpolating function is called to
-provide the interpolated value at the requested time point (t):
+Then, within the derivative function, this interpolating function is
+called to provide the interpolated value at the requested time point
+(t):
 
 ```{r, eval=FALSE}
 tvalue <- afun(t)
@@ -64,9 +82,12 @@ tvalue <- afun(t)
 
 ## Example 1: Time-varying input
 
-The following example uses a Lotka-Volterra-type predator-prey model with an additional
-state equation for a ressource $S$, e.g. a nutrient. This resource is consumed by the producer $P$ that is itself consumed by a consumer $C$. The resource does not regenerate itself, but it can be imported from an external source. The external
-input is described as a time dependent signal.
+The following example uses a Lotka-Volterra-type predator-prey model
+with an additional state equation for a ressource $S$, e.g. a
+nutrient. This resource is consumed by the producer $P$ that is itself
+consumed by a consumer $C$. The resource does not regenerate itself,
+but it can be imported from an external source. The external input is
+described as a time dependent signal.
 
 **Step 1 Create an artificial time-series**
 
@@ -111,12 +132,16 @@ plot(out)
 
 ## Events
 
-An event is a discontinuity in a dynamic model, when the values of state variables change abruptly. In most programming environments, 
-events are techically cumbersome, because when an event occurs, the simulation needs to be restarted.
-This can be done by chaining seperate simulations in loops, but the resulting code can quickly become messy and difficult to read.
+An event is a discontinuity in a dynamic model, when the values of
+state variables change abruptly. In most programming environments,
+events are techically cumbersome, because when an event occurs, the
+simulation needs to be restarted.  This can be done by chaining
+seperate simulations in loops, but the resulting code can quickly
+become messy and difficult to read.
 
-The good news is, that package *deSolve** has a built-in event handling mechanism, 
-where events are part of a model, so that no restart will be necessary by the user.
+The good news is, that package *deSolve** has a built-in event
+handling mechanism, where events are part of a model, so that no
+restart will be necessary by the user.
 
 **Two different types of events in R**
 
@@ -134,25 +159,28 @@ The event handling mechanism of **R/deSolve** can handle two different types of 
     * Event is triggered by a root function
     * Event is specified in an event function
 
-The details are explained at the `?events` help page, but let us now show a small example.
+The details are explained at the `?events` help page, but let us now
+show a small example.
 
 ## Example 2: A patient gets injections in the blood
 
-The example describes is a typical pharmacokinetic problem. The aim is to follow the
-concentration of the drug in the blood and the tissue of the person over a relatively 
-long time (e.g. hours or days), but the injection takes only a few seconds. 
-One idea to model this would be a time dependent forcing variable for the drug. 
+The example describes is a typical pharmacokinetic problem. The aim is
+to follow the concentration of the drug in the blood and the tissue of
+the person over a relatively long time (e.g. hours or days), but the
+injection takes only a few seconds.  One idea to model this would be a
+time dependent forcing variable for the drug.
 
-This can work, but in most cases it will be very inefficient. The reason is, 
-that the simulation time step of the solver must always be shorter than the time step
-of an external discrete forcing function. Otherwise, the solver may jump over the
-the short time periof when the injection occurs. It is obvious that is not very clever to 
-simulate a model with resolution of seconds over several days, just to make sure that 
-a single injection is not overlooked.
+This can work, but in most cases it will be very inefficient. The
+reason is, that the simulation time step of the solver must always be
+shorter than the time step of an external discrete forcing
+function. Otherwise, the solver may jump over the the short time
+periof when the injection occurs. It is obvious that is not very
+clever to simulate a model with resolution of seconds over several
+days, just to make sure that a single injection is not overlooked.
 
-Events are a better appraoch for this problem. Then the ODE can be efficiently solved with a 
-(relatively long) automatic time step, and the event mechanism stops it when something
-important occurs.
+Events are a better appraoch for this problem. Then the ODE can be
+efficiently solved with a (relatively long) automatic time step, and
+the event mechanism stops it when something important occurs.
 
 **Problem Formulation**
 
@@ -179,9 +207,10 @@ yini <- c(blood = 0)
 
 **The event function**
 
-The events can be specified in an event data.frame, containing the state variable that is to be manipulated (`blood`),
-the time steps, when the events occur (`time`), the amount of change (`value`) and the method, how the
-state variable is changed, for example:
+The events can be specified in an event data.frame, containing the
+state variable that is to be manipulated (`blood`), the time steps,
+when the events occur (`time`), the amount of change (`value`) and the
+method, how the state variable is changed, for example:
 
 * Daily doses, at same time of day
 * Injection makes the concentration in the blood increase by 40 units.
@@ -225,8 +254,9 @@ plot(outDrug)
 
 **ODEs describe height of the ball above the ground (y)**
 
-The ODEs can be specified as 2nd order ODE, where $y$ ($\mathrm m$) is the height above 
-ground, $y'$ ($\mathrm m s^{-1}$) is the velocity and $y''$ ($\mathrm m s^{-2}$) is the acceleration:
+The ODEs can be specified as 2nd order ODE, where $y$ ($\mathrm m$) is
+the height above ground, $y'$ ($\mathrm m s^{-1}$) is the velocity and
+$y''$ ($\mathrm m s^{-2}$) is the acceleration:
 
 $$
 \begin{align}
@@ -236,8 +266,9 @@ y'(0) &= 10
 \end{align}
 $$
 
-To solve a 2nd order ODE numerically, it is first transformed to a system of two 1st order ODEs by 
-substituting $y'$ with $y_2$. This forms then the following 1st order ODE:
+To solve a 2nd order ODE numerically, it is first transformed to a
+system of two 1st order ODEs by substituting $y'$ with $y_2$. This
+forms then the following 1st order ODE:
 
 $$
 \begin{align}
@@ -332,7 +363,10 @@ for (i in seq(1, 2001, 10)) {
 
 ## Exercise: Add events to a logistic equation
 
-The logistic equation is a fundamental theoretical and sometimes also practical model, where population growth is described by a population growth rate $r$ and a carrying capacity $K$. It is the origin of the well-known terms "r strategists" and "K strategists".
+The logistic equation is a fundamental theoretical and sometimes also
+practical model, where population growth is described by a population
+growth rate $r$ and a carrying capacity $K$. It is the origin of the
+well-known terms "r strategists" and "K strategists".
 
 **ODE: logistic equation of population growth**
 

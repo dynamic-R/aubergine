@@ -281,9 +281,10 @@ advanced **R** user.
 
 ## Outlook
 
-The model shown here shows some essential properties of a flow-through system,
-used in biotechnology, wastewater treatment plants, or reservoirs and lakes. The
-following tutorials will build up on this and extend the idea further.
+The model shown here shows some essential properties of a flow-through
+system, used in biotechnology, wastewater treatment plants, or
+reservoirs and lakes. The following tutorials will build up on this
+and extend the idea further.
 
 ### References
 
