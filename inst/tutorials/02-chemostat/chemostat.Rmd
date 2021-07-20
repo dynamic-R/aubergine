@@ -244,6 +244,8 @@ state <- data.frame(
   P = 0
 )
 
+y   <- c(N = 5, P = 1)                     # Nutrient (mmolP/m3) and Phytoplankton (mmolC/m3)
+
 ## example how to calculate a single equilibrium
 
 parms["d"] <- state$d[5]
