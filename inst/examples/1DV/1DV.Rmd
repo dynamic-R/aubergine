@@ -1,0 +1,169 @@
+---
+title: "A vertical one-dimensional (1DV) reaction-transport model"
+subtitle: "with time-variable turbulent mixing"
+author: "Karline Soetaert"
+date: '2021'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Introduction
+
+This model shows how the R-packages **deSolve** and **ReacTran** can be used to  model vertical 1D systems, such as the vertical structure of a lake, or a 1D vertical marine water column, where the vertical mixing intensity of the water is imposed from data.
+
+The model describes the temperature evolution in a 50m deep 1-D vertical marine water column. 
+
+The mixing coefficients and the temperature of the upper water layer were derived by means of a turbulence-closure model (details in Soetaert and Middelburg, 2009). These data are read and used as forcing functions in a simple ReacTran model that describes how temperatures change over time due to heating (at the surface) and vertical mixing.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r library, warning=FALSE, message=FALSE}
+require(ReacTran)
+require(plot3D)
+```
+
+## Model grid, forcings
+
+### Vertical dimension: build grid
+
+The model grid is set up, to be consistent with the model that created the forcing function mixing coefficients. The water column is 50 m deep and divided in layers of 1 m thickness.
+
+```{r grid, warnings=FALSE}
+N    <- 50       # Number of cells 
+L    <- 50       # Depth of system (m)
+Grid <- setup.grid.1D(x.up=0, L=L, N=N) 
+```
+
+### Physical forcing functions
+
+The forcing functions are read. They consist of:
+
+* Turbulent diffusion (Kz [m2/s]) dominates vertical transport. The data consist of a vector with diffusion coefficients, defined at the interfaces of the grid cells (N+1 values), and outputted every 3 days. 
+* Temperature is imposed at the surface. We will use the surface temperature as the "boundary condition" the model. This will introduce a certain lag in the temperature model, as in reality, the imposed boundary values were recorded at 0.5 meter below the surface.\footnote{Nudging the modeled surface temperature to these data would be better but is not as instructive.} 
+
+The turbulent diffusion coefficients and temperature were computed beforehand, using a turbulence-closure model; the data is applicable for stratified (marine) conditions.  
+
+In the code chunk below, the data is read and the times, and depth of the forcing functions is set.  Depth should be consistent with the Grid in the model, i.e. Kz should be defined at N+1 points (at the cell interfaces), while temperature should be defined at N points. (if this is not the case, then interpolation of the forcing data on the model grid is in order). The data are in two csv files.
+
+```{r forcings, warning=FALSE}
+depth.int <- Grid$x.int  # depth at interfaces (N+1 values)
+depth.mid <- Grid$x.mid  # depth in middle of cells (N values)
+
+Kzdata    <- as.matrix(read.csv("KzS.csv"))
+forctime  <- seq(from=0, by=3, length.out=nrow(Kzdata))
+
+Tempdata  <- as.matrix(read.csv("TemperatureS.csv"))
+Tupdata   <- as.vector(Tempdata[,1])
+```
+
+The data are shown
+
+```{r, fig.width=8, fig.height=8}
+par(mfrow = c(2,1))
+image2D(z=Kzdata, x=forctime, y=depth.int, ylim=rev(range(depth.int)), 
+        xlab="day", ylab="m", clab="m2/s", main="Kz forcings")
+image2D(z=Tempdata, x=forctime, y=depth.mid, ylim=rev(range(depth.mid)), 
+        xlab="day", ylab="m", clab="dgC", main="Temperature data")
+
+```
+
+## Initial conditions
+
+The model describes the temperature only. As initial condition, we use the first temperature profile from the data.
+
+```{r InitialT}
+T.ini     <- Tempdata[1,]
+```
+
+## A function to extract forcings
+
+During the calculation of the model dynamics, the mixing intensity (vector) and boundary temperature needs to be calculated at every time point.
+
+We create a forcing function (ft) whose sole purpose is to retrieve the nearest value in the dataset for any given day (from 0-365).
+
+```{r}
+ft <- approxfun(x = forctime, y=1:length(forctime))  
+ft(365)
+forctime[ft(365)]
+```
+
+## Derivative function
+
+The model function itself calculates the derivatives of temperature (TEMP). First the vertical mixing coefficients and boundary temperature at the time t are estimated by linear interpolation. Then these values are used in the ReacTran function tran.1D to transport temperature. 
+
+```{r}
+Tfun <- function(t, TEMP, par){
+  
+# Estimate the Kz values (profile) and the surface temperature
+  day   <- trunc(t)   # nr of day
+  i.f   <- ft(day)    # nearest value in forcing function data 
+  
+  tForc <- forctime[i.f]           # time of the forcing values
+  dt    <- forctime[i.f+1]- tForc  # always 3 in this case
+
+       # linear interpolation to the correct time values
+  Kz    <- Kzdata[i.f,] + (day-tForc)/dt* (Kzdata[i.f+1,]-Kzdata[i.f,])  #m2/s
+  T.up  <- Tupdata[i.f] + (day-tForc)/dt* (Tupdata[i.f+1]-Tupdata[i.f])
+  
+# transport of "temperature" - note that T.up is imposed as boundary value (C.up)
+#                                   Kz is converted to m2/d
+  T.tran <- tran.1D(C=TEMP, C.up=T.up, D=Kz*86400, dx=Grid)   # Kz converted to m2/d
+  
+  list(dT_dt = T.tran$dC,    # dTEMP/dt 
+       Kz=Kz, 
+       T.up=T.up, T.mean=mean(TEMP))
+}
+  
+```
+
+## Running this model
+
+The model is run for one year (the length of the forcing time series)
+
+```{r, fig.width=8, fig.height=8}
+times <- seq(0, 366, by=3)
+out   <- ode.1D(y=T.ini, times=times, parms=NULL, func=Tfun, 
+                names="TEMP", nspec=1)
+```
+
+```{r, fig.width=8, fig.height=8}
+par(mfrow=c(2,2))
+image(out, method="image2D", grid=depth.mid, ylim=c(50,0), 
+      main="Modeled Temperature", clab="dgC", mfrow=NULL)
+image(out, which="Kz", method="image2D", grid=depth.int, 
+      ylim=c(50,0), main = "Estimated Kz", clab="m2/s",mfrow=NULL)
+plot (out, which="T.up", mfrow=NULL, ylab="dgC", main="boundary temperature")
+plot (out, which="T.mean", mfrow=NULL, ylab="dgC", main="mean temperature")
+```
+
+## Checking model results
+
+The consistency of this model is checked by plotting the "modeled temperature" data with the forcing function data. Note that the correspondence is not 100%, as the forcing function temperature data at 0.5 m depth is imposed at the boundary. 
+
+```{r}
+Tmodel <- subset(out, which="TEMP")
+Tdata <- as.matrix(Tempdata[1:nrow(Tmodel),])
+plot(Tmodel, Tdata, pch = ".",
+     xlab="Modeled temperature", ylab="forcing temperature")
+abline(a=0, b=1, col="grey")
+```
+
+## Finally
+
+The model described here can be seen as a starting point for more complex 
+applications, e.g. adding other state variables.
+
+## References
+
+Soetaert, Karline and Meysman, Filip, 2012. Reactive transport in aquatic
+  ecosystems: Rapid model prototyping in the open source software R
+  Environmental Modelling & Software, 32, 49-60.
+
+Karline Soetaert, Thomas Petzoldt, R. Woodrow Setzer (2010). Solving
+  Differential Equations in R: Package deSolve. Journal of Statistical Software,
+  33(9), 1--25. URL http://www.jstatsoft.org/v33/i09/ DOI 10.18637/jss.v033.i09
+
+Karline	Soetaert, K. & Jack J. Middelburg, 2009. Modeling eutrophication and oligotrophication of shallow-water marine systems: the importance of sediments and stratification. Hydrobiologia, 629, 239-254. DOI 10.1007/s10750-009-9777-x
